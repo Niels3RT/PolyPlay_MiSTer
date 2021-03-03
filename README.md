@@ -10,7 +10,7 @@ See https://en.wikipedia.org/wiki/Poly_Play
 
 ## The MiSTer Core
 
-There is a lot of guesswork going on (clocks, video). But its playable.
+There is a lot of guesswork going on (clocks, video). Tested on HDMI output only, analog video hopefully soon.
 
 First button is fire, second button coin.
 
