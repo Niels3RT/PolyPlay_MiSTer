@@ -4,7 +4,7 @@ This is the Poly-Play arcade from East Germany for the [MiSTer board](https://gi
 
 All information taken from [mame/polyplay.cpp](https://github.com/mamedev/mame/blob/master/src/mame/drivers/polyplay.cpp). Many thanks to Martin Buchholz and all the other contributors.
 
-Heavily based on the [kc87](https://github.com/beokim/kc87fpga) and [KC85/4](https://github.com/beokim/kc854fpga) cores by beokim.
+Heavily based on the [KC87](https://github.com/beokim/kc87fpga) and [KC85/4](https://github.com/beokim/kc854fpga) cores by beokim.
 
 See https://en.wikipedia.org/wiki/Poly_Play
 
