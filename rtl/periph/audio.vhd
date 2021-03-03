@@ -71,7 +71,7 @@ begin
 		end if;
 		ctcTcTo_old(1) <= ctc_to(1);
 		
---		-- play audio
+		-- play audio
 		divide_frq <= divide_frq + 1;
 		if divide_frq(4 downto 0) = b"00000" then
 			if sig_noise(0) = '1' then

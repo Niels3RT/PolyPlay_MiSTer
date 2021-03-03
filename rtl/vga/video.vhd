@@ -151,7 +151,7 @@ begin
 
 		-- blank
 		hblank <= not(H_BLANK_ACTIVE);
-		if (countH >= H_DISP) then 
+		if (countH >= H_DISP + SYNC_DELAY-1) or (countH < SYNC_DELAY-1) then 
 			hblank <= H_BLANK_ACTIVE;
 		end if;
 
@@ -166,7 +166,7 @@ begin
 	-- color+output
 	process (display, outputa, outputb, outputc, countV)
 	begin
-		if display and countV /= 0 then
+		if display then
 			red   <= (others => outputc(7));
 			green <= (others => outputb(7));
 			blue  <= (others => outputa(7));

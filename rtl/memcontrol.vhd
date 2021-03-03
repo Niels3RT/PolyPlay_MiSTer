@@ -1,5 +1,5 @@
 --
--- complete rewrite by Niels Lueddecke in 2021
+-- complete rewrite for Poly-Play by Niels Lueddecke in 2021
 --
 -- Copyright (c) 2015, $ME
 -- All rights reserved.
@@ -86,13 +86,11 @@ architecture rtl of memcontrol is
 	-- video ram
 	signal ram_vid_do_1		: std_logic_vector(7 downto 0);
 	signal ram_vid_we_n_1	: std_logic;
-	--signal ram_vid_do_2		: std_logic_vector(7 downto 0);
 	
 	-- roms
 	signal rom_zre_00_dat	: std_logic_vector(7 downto 0);
 	signal rom_zre_04_dat	: std_logic_vector(7 downto 0);
 	signal rom_zre_08_dat	: std_logic_vector(7 downto 0);
-	--signal rom_char1_e8_dat	: std_logic_vector(7 downto 0);
 	signal rom_10_dat			: std_logic_vector(7 downto 0);
 	signal rom_14_dat			: std_logic_vector(7 downto 0);
 	signal rom_18_dat			: std_logic_vector(7 downto 0);
@@ -202,8 +200,6 @@ begin
 				elsif	cpuAddr(15 downto 8) < x"88" then cpuDOut <= rom_84_dat;			-- Wasserrohrbruch                (8000 - 8fff)
 				elsif	cpuAddr(15 downto 8) < x"8c" then cpuDOut <= rom_88_dat;			-- Wasserrohrbruch                (8000 - 8fff)
 				elsif	cpuAddr(15 downto 8) < x"90" then cpuDOut <= rom_8c_dat;			-- Wasserrohrbruch                (8000 - 8fff)
-				
-				--elsif	cpuAddr(15 downto 8) < x"ec" then cpuDOut <= rom_char1_e8_dat;	-- e800 - ebff ABS   Character ROM (chr 00..7f) 1 bit per pixel
 				elsif	cpuAddr(15 downto 8) < x"f0" then cpuDOut <= ram_char_do_1a;	-- ec00 - f7ff ABS   Character RAM (chr 80..ff) 3 bit per pixel
 				elsif	cpuAddr(15 downto 8) < x"f4" then cpuDOut <= ram_char_do_1b;	-- ec00 - f7ff ABS   Character RAM (chr 80..ff) 3 bit per pixel
 				elsif	cpuAddr(15 downto 8) < x"f8" then cpuDOut <= ram_char_do_1c;	-- ec00 - f7ff ABS   Character RAM (chr 80..ff) 3 bit per pixel
@@ -347,14 +343,6 @@ begin
 			addr => cpuAddr(9 downto 0),
 			data => rom_zre_08_dat
 		);
-		
---	-- character rom, e800h - ebffh, 1k
---	rom_char1_e8 : entity work.rom_char1
---		port map (
---			clk => clk,
---			addr => cpuAddr(9 downto 0),
---			data => rom_char1_e8_dat
---		);
 	
 	-- pfs rom, 1000h - 13ffh, 1k
 	rom_10 : entity work.rom2_1000

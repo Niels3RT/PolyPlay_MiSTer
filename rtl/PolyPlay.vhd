@@ -1,7 +1,7 @@
 --
 -- Port to MiSTer by Niels Lueddecke
 --
--- Original Copyright notice:
+-- Original Copyright notice that came with the kc854 core:
 --
 -- Copyright (c) 2015, $ME
 -- All rights reserved.
@@ -42,13 +42,7 @@ entity PolyPlay is
 		clkLocked		: in  std_logic;
 		reset_sig		: in  std_logic;
 		
-		ps2_key			: in std_logic_vector(10 downto 0);
 		joystick_0		: in  std_logic_vector(31 downto 0);
-		turbo				: in std_logic_vector(1 downto 0);
-		
-		scandouble		: in  std_logic;
-
-		ce_pix			: out  std_logic;
 
 		HBlank			: out std_logic;
 		HSync				: out std_logic;
@@ -63,25 +57,11 @@ entity PolyPlay is
 		AUDIO_L			: out std_logic_vector(15 downto 0);
 		AUDIO_R			: out std_logic_vector(15 downto 0);
 		
-		audioEn_n		: in  std_logic;
-		tapeEn			: in  std_logic;
-		
 		LED_USER			: out std_logic;
 		LED_POWER		: out std_logic_vector(1 downto 0);
 		LED_DISK			: out std_logic_vector(1 downto 0);
 		
-		USER_OUT			: out std_logic_vector(6 downto 0);
-		SD_SCK			: out std_logic;
-		SD_MOSI			: out std_logic;
-		UART_TXD			: out std_logic;
-		
-		hps_status		: in  std_logic_vector(31 downto 0);
-		ioctl_download	: in  std_logic;
-		ioctl_index		: in  std_logic_vector(7 downto 0);
-		ioctl_wr			: in  std_logic;
-		ioctl_addr		: in  std_logic_vector(24 downto 0);
-		ioctl_data		: in  std_logic_vector(7 downto 0);
-		ioctl_wait		: out  std_logic
+		USER_OUT			: out std_logic_vector(6 downto 0)
     );
 end PolyPlay;
 
@@ -106,12 +86,6 @@ architecture struct of PolyPlay is
 	signal cpuIntEna_n	: std_logic;
 	
 	signal memDataOut		: std_logic_vector(7 downto 0);
-	
-	signal vidAddr			: std_logic_vector(13 downto 0) := (others => '0');
-	signal vidData			: std_logic_vector(15 downto 0);
-	signal vidBusy			: std_logic;
-	signal vidRead			: std_logic;
-	signal vidHires		: std_logic;
 
 	signal ioSel			: boolean;
     
@@ -142,10 +116,6 @@ architecture struct of PolyPlay is
 	
 	signal resetDelay		: integer range 0 to RESET_DELAY := RESET_DELAY;
 	
-	-- TEMP audio_l debug
-	signal AUDIO_L_DBG	: std_logic_vector(15 downto 0);
-	signal AUDIO_R_DBG	: std_logic_vector(15 downto 0);
-	
 	-- chargen
 	signal cg_ram_Addr	: std_logic_vector(9 downto 0);
 	signal cg_ram_Dataa	: std_logic_vector(7 downto 0);
@@ -160,12 +130,6 @@ architecture struct of PolyPlay is
 begin
 	-- debug output
 	USER_OUT <= dbg_out(6 downto 0);
-
-	-- turn on video output
-	ce_pix <= '1';
-	
-	-- don't wait, keep framework running
-	ioctl_wait <= '0';
 
 	-- reset
 	cpuReset_n <= '0' when resetDelay /= 0 else '1';
@@ -302,17 +266,12 @@ begin
 		);
 
 	-- audio output
-	AUDIO_L <= AUDIO_L_DBG;
-	AUDIO_R <= AUDIO_R_DBG;
 	audio_out : entity work.audio
 		port map (
 			clk			=> clk_audio,
 			reset_n		=> cpuReset_n,
-			--AUDIO_L		=> AUDIO_L,
-			AUDIO_L		=> AUDIO_L_DBG,
-			AUDIO_R		=> AUDIO_R_DBG,
-			--AUDIO_S		=> AUDIO_S,
-			--AUDIO_MIX	=> AUDIO_MIX,
+			AUDIO_L		=> AUDIO_L,
+			AUDIO_R		=> AUDIO_R,
 			ctcTcTo		=> ctcZcTo(1 downto 0)
 		);
 	
