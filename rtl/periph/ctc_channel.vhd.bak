@@ -158,9 +158,6 @@ begin
                     
                     if (dIn(2)='1') then -- Time Constant Follows
                         nextState <= setTimeConstant;
-						  else
-								running <= false;	-- hack for polyplay to stop audio, undocumented feature?
-														-- now behaves like mame???
                     end if;
                     
                     if (dIn(1)='1') then -- reset

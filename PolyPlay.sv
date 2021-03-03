@@ -201,22 +201,16 @@ assign VIDEO_ARY = (!ar) ? 12'd3 : 12'd0;
 wire [1:0] turbo = status[4:3];
 wire audioEn_n   = status[5];
 wire tapeEn      = status[6];
-assign AUDIO_MIX = status[8:7];
+assign AUDIO_MIX = status[4:3];
 assign AUDIO_S   = 0;  // unsigned audio data
 
 `include "build_id.v" 
 localparam CONF_STR = {
-	"KC85-4;;",
+	"Poly-Play;;",
 	"-;",
 	"O12,Aspect ratio,Original,Full Screen,[ARC1],[ARC2];",
 	"-;",
-	"O34,CPU Turbo,1x,2x,4x,8x;",
-	"-;",
-	"F,TAP,Load Tape;",
-	"-;",
-	"O5,Audio,ON,OFF;",
-	"O6,Tape Noise,OFF,ON;",
-	"O78,Stereo Mix,None,25%,50%,100%;",
+	"O34,Stereo Mix,None,25%,50%,100%;",
 	"-;",
 	"T0,Reset;",
 	"R0,Reset and close OSD;",

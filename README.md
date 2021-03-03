@@ -10,7 +10,7 @@ See https://en.wikipedia.org/wiki/Poly_Play
 
 ## The MiSTer Core
 
-Sound has some issues, the displayed screen area is a little off, there could be some debug pin wiggling on the user port, some cleanup is needed and there is a lot of guesswork going on (clocks, video). But its playable.
+The displayed screen area is a little off, there could be some debug pin wiggling on the user port, some cleanup is needed and there is a lot of guesswork going on (clocks, video). But its playable.
 
 First button is fire, second button coin.
 
