@@ -1,0 +1,25 @@
+<misterromdescription>
+	<name>Poly Play 2</name>
+	<mameversion>0220</mameversion>
+	<setname>Poly Play 2</setname>
+	<mratimestamp>20210304162445</mratimestamp>
+	<year>1985</year>
+	<manufacturer>VEB Polytechnik</manufacturer>
+	<category>Action</category>
+	<rbf>PolyPlay</rbf>
+
+	<rom index="1">
+		<part>01</part>
+	</rom>
+
+	<rom index="0" zip="polyplay2.zip" md5="cfa0e2b01ec9109ddda57813a5d38c64">
+		<part crc="D728CA42" name="2_1.rom"/>
+		<part crc="52316236" name="2_2.rom"/>
+		<part crc="E199D303" name="2_3.rom"/>
+		<part crc="1324C2E2" name="2_4.rom"/>
+		<part crc="2E959FE9" name="2_5.rom"/>
+		<part crc="85774542" name="2_6.rom"/>
+		<part crc="4F028AF9" name="1_1.bin"/>
+	</rom>
+   
+</misterromdescription>

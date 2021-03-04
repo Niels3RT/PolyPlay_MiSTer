@@ -31,35 +31,36 @@ use ieee.numeric_std.all;
 
 entity memcontrol is
 	port (
-	clk				: in  std_logic;
-	vgaclk			: in  std_logic;
-	reset_n			: in  std_logic;
+		clk				: in  std_logic;
+		vgaclk			: in  std_logic;
+		reset_n			: in  std_logic;
 
-	cpuAddr			: in  std_logic_vector(15 downto 0);
-	cpuDOut			: out std_logic_vector(7 downto 0);
-	cpuDIn			: in  std_logic_vector(7 downto 0);
+		cpuAddr			: in  std_logic_vector(15 downto 0);
+		cpuDOut			: out std_logic_vector(7 downto 0);
+		cpuDIn			: in  std_logic_vector(7 downto 0);
 
-	cpuWR_n			: in  std_logic;
-	cpuRD_n			: in  std_logic;
-	cpuM1_n			: in  std_logic;
-	cpuMREQ_n		: in  std_logic;
-	cpuIORQ_n		: in  std_logic;
+		cpuWR_n			: in  std_logic;
+		cpuRD_n			: in  std_logic;
+		cpuM1_n			: in  std_logic;
+		cpuMREQ_n		: in  std_logic;
+		cpuIORQ_n		: in  std_logic;
 
-	cpuEn				: out std_logic;
-	cpuWait			: out std_logic;
+		cpuEn				: out std_logic;
+		cpuWait			: out std_logic;
 
-	cpuTick			: in  std_logic;
+		cpuTick			: in  std_logic;
 
-	cg_ram_Addr		: in  std_logic_vector(9 downto 0);
-	cg_ram_Dataa	: out std_logic_vector(7 downto 0);
-	cg_ram_Datab	: out std_logic_vector(7 downto 0);
-	cg_ram_Datac	: out std_logic_vector(7 downto 0);
-	vid_ram_Addr	: in  std_logic_vector(10 downto 0);
-	vid_ram_Data	: out std_logic_vector(7 downto 0);
-	
-	dn_addr			: in std_logic_vector(15 downto 0);
-	dn_data			: in std_logic_vector(7 downto 0);
-	dn_wr				: in std_logic
+		cg_ram_Addr		: in  std_logic_vector(9 downto 0);
+		cg_ram_Dataa	: out std_logic_vector(7 downto 0);
+		cg_ram_Datab	: out std_logic_vector(7 downto 0);
+		cg_ram_Datac	: out std_logic_vector(7 downto 0);
+		vid_ram_Addr	: in  std_logic_vector(10 downto 0);
+		vid_ram_Data	: out std_logic_vector(7 downto 0);
+		
+		dn_addr			: in std_logic_vector(15 downto 0);
+		dn_data			: in std_logic_vector(7 downto 0);
+		dn_wr				: in std_logic;
+		tno				: in std_logic_vector(7 downto 0)
 	);
 end memcontrol;
 
@@ -67,104 +68,31 @@ architecture rtl of memcontrol is
 	type   state_type is ( idle, idle_wait, do_idle, read_wait, do_read, write_wait, do_write, finish );
 	signal mem_state    		: state_type := idle;
 	
-	signal tmp_adr				: std_logic_vector(15 downto 0);
-	signal tmp_data_in		: std_logic_vector(7 downto 0);
-
+	-- ram
+	signal ram_adr				: std_logic_vector(15 downto 0);
+	signal ram_data_in		: std_logic_vector(7 downto 0);
+	
+	-- main ram block
+	signal ram_main_do		: std_logic_vector(7 downto 0);
+	signal ram_main_we_n		: std_logic := '1';
+	signal ram_main_we_n_t	: std_logic := '1';
+	
+	-- char ram
+	signal ram_char_do_1a	: std_logic_vector(7 downto 0);
+	signal ram_char_we_n_1a	: std_logic := '1';
+	signal ram_char_do_1b	: std_logic_vector(7 downto 0);
+	signal ram_char_we_n_1b	: std_logic := '1';
+	signal ram_char_do_1c	: std_logic_vector(7 downto 0);
+	signal ram_char_we_n_1c	: std_logic := '1';
+	
+	-- video ram
+	signal ram_vid_do_1		: std_logic_vector(7 downto 0);
+	signal ram_vid_we_n_1	: std_logic := '1';
+	
 	-- video read stuff
 	signal vid_state			: std_logic_vector(1 downto 0) := (others => '0');
 	signal vid_adr_old		: std_logic_vector(13 downto 0) := (others => '1');
 	
-	-- work ram
-	signal ram_work_do		: std_logic_vector(7 downto 0);
-	signal ram_work_we_n		: std_logic;
-	
-	-- char ram
-	signal ram_char_do_1a	: std_logic_vector(7 downto 0);
-	signal ram_char_we_n_1a	: std_logic;
-	signal ram_char_do_1b	: std_logic_vector(7 downto 0);
-	signal ram_char_we_n_1b	: std_logic;
-	signal ram_char_do_1c	: std_logic_vector(7 downto 0);
-	signal ram_char_we_n_1c	: std_logic;
-	
-	-- video ram
-	signal ram_vid_do_1		: std_logic_vector(7 downto 0);
-	signal ram_vid_we_n_1	: std_logic;
-	
-	-- roms
-	signal romAddr				: std_logic_vector(9 downto 0);
-	signal rom_zre_00_dat	: std_logic_vector(7 downto 0);
-	signal rom_zre_04_dat	: std_logic_vector(7 downto 0);
-	signal rom_zre_08_dat	: std_logic_vector(7 downto 0);
-	signal rom_10_dat			: std_logic_vector(7 downto 0);
-	signal rom_14_dat			: std_logic_vector(7 downto 0);
-	signal rom_18_dat			: std_logic_vector(7 downto 0);
-	signal rom_1c_dat			: std_logic_vector(7 downto 0);
-	signal rom_20_dat			: std_logic_vector(7 downto 0);
-	signal rom_24_dat			: std_logic_vector(7 downto 0);
-	signal rom_28_dat			: std_logic_vector(7 downto 0);
-	signal rom_2c_dat			: std_logic_vector(7 downto 0);
-	signal rom_30_dat			: std_logic_vector(7 downto 0);
-	signal rom_34_dat			: std_logic_vector(7 downto 0);
-	signal rom_38_dat			: std_logic_vector(7 downto 0);
-	signal rom_3c_dat			: std_logic_vector(7 downto 0);
-	signal rom_40_dat			: std_logic_vector(7 downto 0);
-	signal rom_44_dat			: std_logic_vector(7 downto 0);
-	signal rom_48_dat			: std_logic_vector(7 downto 0);
-	signal rom_4c_dat			: std_logic_vector(7 downto 0);
-	signal rom_50_dat			: std_logic_vector(7 downto 0);
-	signal rom_54_dat			: std_logic_vector(7 downto 0);
-	signal rom_58_dat			: std_logic_vector(7 downto 0);
-	signal rom_5c_dat			: std_logic_vector(7 downto 0);
-	signal rom_60_dat			: std_logic_vector(7 downto 0);
-	signal rom_64_dat			: std_logic_vector(7 downto 0);
-	signal rom_68_dat			: std_logic_vector(7 downto 0);
-	signal rom_6c_dat			: std_logic_vector(7 downto 0);
-	signal rom_70_dat			: std_logic_vector(7 downto 0);
-	signal rom_74_dat			: std_logic_vector(7 downto 0);
-	signal rom_78_dat			: std_logic_vector(7 downto 0);
-	signal rom_7c_dat			: std_logic_vector(7 downto 0);
-	signal rom_80_dat			: std_logic_vector(7 downto 0);
-	signal rom_84_dat			: std_logic_vector(7 downto 0);
-	signal rom_88_dat			: std_logic_vector(7 downto 0);
-	signal rom_8c_dat			: std_logic_vector(7 downto 0);
-	
-	-- rom loading from mra
-	signal rom_zre_00_we_n	: std_logic;
-	signal rom_zre_04_we_n	: std_logic;
-	signal rom_zre_08_we_n	: std_logic;
-	signal rom_10_we_n		: std_logic;
-	signal rom_14_we_n		: std_logic;
-	signal rom_18_we_n		: std_logic;
-	signal rom_1c_we_n		: std_logic;
-	signal rom_20_we_n		: std_logic;
-	signal rom_24_we_n		: std_logic;
-	signal rom_28_we_n		: std_logic;
-	signal rom_2c_we_n		: std_logic;
-	signal rom_30_we_n		: std_logic;
-	signal rom_34_we_n		: std_logic;
-	signal rom_38_we_n		: std_logic;
-	signal rom_3c_we_n		: std_logic;
-	signal rom_40_we_n		: std_logic;
-	signal rom_44_we_n		: std_logic;
-	signal rom_48_we_n		: std_logic;
-	signal rom_4c_we_n		: std_logic;
-	signal rom_50_we_n		: std_logic;
-	signal rom_54_we_n		: std_logic;
-	signal rom_58_we_n		: std_logic;
-	signal rom_5c_we_n		: std_logic;
-	signal rom_60_we_n		: std_logic;
-	signal rom_64_we_n		: std_logic;
-	signal rom_68_we_n		: std_logic;
-	signal rom_6c_we_n		: std_logic;
-	signal rom_70_we_n		: std_logic;
-	signal rom_74_we_n		: std_logic;
-	signal rom_78_we_n		: std_logic;
-	signal rom_7c_we_n		: std_logic;
-	signal rom_80_we_n		: std_logic;
-	signal rom_84_we_n		: std_logic;
-	signal rom_88_we_n		: std_logic;
-	signal rom_8c_we_n		: std_logic;
-
 begin
 	
 	-- serve cpu
@@ -182,18 +110,16 @@ begin
 		-- memory state machine
 		case mem_state is
 			when idle =>
-				if (reset_n='0') then
-					--cpuDOut <= romE_caos_data;	-- ROM CAOS E reset vector
-				elsif cpuTick = '1' then
+				if cpuTick = '1' then
 					mem_state <= idle_wait;
 					-- write memory
 					if		(cpuMREQ_n = '0' and cpuWR_n = '0') then
-						mem_state <= write_wait;
-						if		cpuAddr(15 downto 8) < x"10" then ram_work_we_n    <= '0';	-- work ram
-						elsif	cpuAddr(15 downto 8) < x"f0" then ram_char_we_n_1a <= '0';	-- character ram a
-						elsif	cpuAddr(15 downto 8) < x"f4" then ram_char_we_n_1b <= '0';	-- character ram b
-						elsif	cpuAddr(15 downto 8) < x"f8" then ram_char_we_n_1c <= '0';	-- character ram c
-						else												 ram_vid_we_n_1   <= '0';	-- video ram
+						mem_state   <= write_wait;
+						if		cpuAddr < x"ec00" then ram_main_we_n_t  <= '0';	-- main ram
+						elsif	cpuAddr < x"f000" then ram_char_we_n_1a <= '0';	-- character ram a
+						elsif	cpuAddr < x"f400" then ram_char_we_n_1b <= '0';	-- character ram b
+						elsif	cpuAddr < x"f800" then ram_char_we_n_1c <= '0';	-- character ram c
+						else								  ram_vid_we_n_1   <= '0';	-- video ram
 						end if;
 					-- read memory
 					elsif (cpuMREQ_n='0' and cpuRD_n='0') then
@@ -205,57 +131,22 @@ begin
 			when do_read =>
 				mem_state <= finish;
 				-- decide which DO to send to cpu
-				if		cpuAddr(15 downto 8) < x"04" then cpuDOut <= rom_zre_00_dat;	-- OS ROM                         (0000 - 03ff)
-				elsif	cpuAddr(15 downto 8) < x"08" then cpuDOut <= rom_zre_04_dat;	-- Game ROM used for Abfahrtslauf (0400 - 07ff)
-				elsif	cpuAddr(15 downto 8) < x"0c" then cpuDOut <= rom_zre_08_dat;	-- Menu Screen ROM                (0800 - 0bff)
-				elsif	cpuAddr(15 downto 8) < x"10" then cpuDOut <= ram_work_do;		-- Work RAM                       (0c00 - 0fff)
-				elsif	cpuAddr(15 downto 8) < x"14" then cpuDOut <= rom_10_dat;			-- Abfahrtslauf                   (1000 - 1bff)
-				elsif	cpuAddr(15 downto 8) < x"18" then cpuDOut <= rom_14_dat;			-- Abfahrtslauf                   (1000 - 1bff)
-				elsif	cpuAddr(15 downto 8) < x"1c" then cpuDOut <= rom_18_dat;			-- Abfahrtslauf                   (1000 - 1bff)
-				elsif	cpuAddr(15 downto 8) < x"20" then cpuDOut <= rom_1c_dat;			-- Hirschjagd                     (1c00 - 27ff)
-				elsif	cpuAddr(15 downto 8) < x"24" then cpuDOut <= rom_20_dat;			-- Hirschjagd                     (1c00 - 27ff)
-				elsif	cpuAddr(15 downto 8) < x"28" then cpuDOut <= rom_24_dat;			-- Hirschjagd                     (1c00 - 27ff)
-				elsif	cpuAddr(15 downto 8) < x"2c" then cpuDOut <= rom_28_dat;			-- Hase und Wolf                  (2800 - 3fff)
-				elsif	cpuAddr(15 downto 8) < x"30" then cpuDOut <= rom_2c_dat;			-- Hase und Wolf                  (2800 - 3fff)
-				elsif	cpuAddr(15 downto 8) < x"34" then cpuDOut <= rom_30_dat;			-- Hase und Wolf                  (2800 - 3fff)
-				elsif	cpuAddr(15 downto 8) < x"38" then cpuDOut <= rom_34_dat;			-- Hase und Wolf                  (2800 - 3fff)
-				elsif	cpuAddr(15 downto 8) < x"3c" then cpuDOut <= rom_38_dat;			-- Hase und Wolf                  (2800 - 3fff)
-				elsif	cpuAddr(15 downto 8) < x"40" then cpuDOut <= rom_3c_dat;			-- Hase und Wolf                  (2800 - 3fff)
-				elsif	cpuAddr(15 downto 8) < x"44" then cpuDOut <= rom_40_dat;			-- Schmetterlingsfang             (4000 - 4fff)
-				elsif	cpuAddr(15 downto 8) < x"48" then cpuDOut <= rom_44_dat;			-- Schmetterlingsfang             (4000 - 4fff)
-				elsif	cpuAddr(15 downto 8) < x"4c" then cpuDOut <= rom_48_dat;			-- Schmetterlingsfang             (4000 - 4fff)
-				elsif	cpuAddr(15 downto 8) < x"50" then cpuDOut <= rom_4c_dat;			-- Schmetterlingsfang             (4000 - 4fff)
-				elsif	cpuAddr(15 downto 8) < x"54" then cpuDOut <= rom_50_dat;			-- Schiessbude                    (5000 - 5fff)
-				elsif	cpuAddr(15 downto 8) < x"58" then cpuDOut <= rom_54_dat;			-- Schiessbude                    (5000 - 5fff)
-				elsif	cpuAddr(15 downto 8) < x"5c" then cpuDOut <= rom_58_dat;			-- Schiessbude                    (5000 - 5fff)
-				elsif	cpuAddr(15 downto 8) < x"60" then cpuDOut <= rom_5c_dat;			-- Schiessbude                    (5000 - 5fff)
-				elsif	cpuAddr(15 downto 8) < x"64" then cpuDOut <= rom_60_dat;			-- Autorennen                     (6000 - 73ff)
-				elsif	cpuAddr(15 downto 8) < x"68" then cpuDOut <= rom_64_dat;			-- Autorennen                     (6000 - 73ff)
-				elsif	cpuAddr(15 downto 8) < x"6c" then cpuDOut <= rom_68_dat;			-- Autorennen                     (6000 - 73ff)
-				elsif	cpuAddr(15 downto 8) < x"70" then cpuDOut <= rom_6c_dat;			-- Autorennen                     (6000 - 73ff)
-				elsif	cpuAddr(15 downto 8) < x"74" then cpuDOut <= rom_70_dat;			-- Autorennen                     (6000 - 73ff)
-				elsif	cpuAddr(15 downto 8) < x"78" then cpuDOut <= rom_74_dat;			-- opto-akust. Merkspiel          (7400 - 7fff)
-				elsif	cpuAddr(15 downto 8) < x"7c" then cpuDOut <= rom_78_dat;			-- opto-akust. Merkspiel          (7400 - 7fff)
-				elsif	cpuAddr(15 downto 8) < x"80" then cpuDOut <= rom_7c_dat;			-- opto-akust. Merkspiel          (7400 - 7fff)
-				elsif	cpuAddr(15 downto 8) < x"84" then cpuDOut <= rom_80_dat;			-- Wasserrohrbruch                (8000 - 8fff)
-				elsif	cpuAddr(15 downto 8) < x"88" then cpuDOut <= rom_84_dat;			-- Wasserrohrbruch                (8000 - 8fff)
-				elsif	cpuAddr(15 downto 8) < x"8c" then cpuDOut <= rom_88_dat;			-- Wasserrohrbruch                (8000 - 8fff)
-				elsif	cpuAddr(15 downto 8) < x"90" then cpuDOut <= rom_8c_dat;			-- Wasserrohrbruch                (8000 - 8fff)
-				elsif	cpuAddr(15 downto 8) < x"f0" then cpuDOut <= ram_char_do_1a;	-- ec00 - f7ff ABS   Character RAM (chr 80..ff) 3 bit per pixel
-				elsif	cpuAddr(15 downto 8) < x"f4" then cpuDOut <= ram_char_do_1b;	-- ec00 - f7ff ABS   Character RAM (chr 80..ff) 3 bit per pixel
-				elsif	cpuAddr(15 downto 8) < x"f8" then cpuDOut <= ram_char_do_1c;	-- ec00 - f7ff ABS   Character RAM (chr 80..ff) 3 bit per pixel
-				else												 cpuDOut <= ram_vid_do_1;		-- f800 - ffff FAZ   Video RAM
+				if		cpuAddr < x"ec00" then cpuDOut <= ram_main_do;		-- main ram
+				elsif	cpuAddr < x"f000" then cpuDOut <= ram_char_do_1a;	-- character ram a
+				elsif	cpuAddr < x"f400" then cpuDOut <= ram_char_do_1b;	-- character ram b
+				elsif	cpuAddr < x"f800" then cpuDOut <= ram_char_do_1c;	-- character ram c
+				else								  cpuDOut <= ram_vid_do_1;		-- video ram
 				end if;
 			when write_wait =>
 				mem_state <= do_write;
 			when do_write =>
 				mem_state <= finish;
-				ram_work_we_n    <= '1';
+				ram_main_we_n_t  <= '1';
 				ram_char_we_n_1a <= '1';
 				ram_char_we_n_1b <= '1';
 				ram_char_we_n_1c <= '1';
 				ram_vid_we_n_1   <= '1';
-				cpuDOut <= tmp_data_in;
+				cpuDOut <= ram_data_in;
 			when idle_wait =>
 				mem_state <= do_idle;
 			when do_idle =>
@@ -265,20 +156,32 @@ begin
 				cpuEn		<= '1';
 			end case;
 	end process;
-	 
-	-- work ram 0c00h - 0fffh, 1k module
-	ram_work : entity work.sram
+	
+	-- rom filling from mra
+	ram_main_we_n <=  '0' when dn_wr = '1' and dn_addr >= x"0400" and tno = x"00" else 	-- polyplay
+							'0' when dn_wr = '1' and dn_addr <  x"c000" and tno = x"01" else	-- polyplay 2
+							ram_main_we_n_t;
+	ram_data_in <= dn_data when dn_wr = '1' else cpuDIn;
+	ram_adr <=	b"000000" & dn_addr(9 downto 0) when dn_addr(15 downto 10) = b"000001" and dn_wr = '1' and tno = x"00" else		-- polyplay zre_00
+					b"000001" & dn_addr(9 downto 0) when dn_addr(15 downto 10) = b"000010" and dn_wr = '1' and tno = x"00" else		-- polyplay zre_04
+					b"000010" & dn_addr(9 downto 0) when dn_addr(15 downto 10) = b"000011" and dn_wr = '1' and tno = x"00" else		-- polyplay zre_08
+					dn_addr when                                                               dn_wr = '1' and tno = x"00" else		-- polyplay game roms
+					dn_addr when dn_addr < x"c000"                                         and dn_wr = '1' and tno = x"01" else		-- polyplay 2 roms 1:1
+					cpuAddr;																																			-- done rom fill, use cpu addr
+	
+	-- main ram block 0000h - dfffh, 64k module
+	ram_main : entity work.sram
 		generic map (
-			AddrWidth => 10,
+			AddrWidth => 16,
 			DataWidth => 8
 		)
 		port map (
 			clk  => clk,
-			addr => cpuAddr(9 downto 0),
-			din  => cpuDIn,
-			dout => ram_work_do,
+			addr => ram_adr,
+			din  => ram_data_in,
+			dout => ram_main_do,
 			ce_n => '0', 
-			we_n => ram_work_we_n
+			we_n => ram_main_we_n
 		);
 	
 	-- character ram ec00h - f7ffh, 3x1k module
@@ -288,8 +191,8 @@ begin
 		)
 		port map (
 			clk1  => clk,
-			addr1 => cpuAddr(9 downto 0),
-			din1  => cpuDIn,
+			addr1 => ram_adr(9 downto 0),
+			din1  => ram_data_in,
 			dout1 => ram_char_do_1a,
 			cs1_n => '0', 
 			wr1_n => ram_char_we_n_1a,
@@ -307,8 +210,8 @@ begin
 		)
 		port map (
 			clk1  => clk,
-			addr1 => cpuAddr(9 downto 0),
-			din1  => cpuDIn,
+			addr1 => ram_adr(9 downto 0),
+			din1  => ram_data_in,
 			dout1 => ram_char_do_1b,
 			cs1_n => '0', 
 			wr1_n => ram_char_we_n_1b,
@@ -326,8 +229,8 @@ begin
 		)
 		port map (
 			clk1  => clk,
-			addr1 => cpuAddr(9 downto 0),
-			din1  => cpuDIn,
+			addr1 => ram_adr(9 downto 0),
+			din1  => ram_data_in,
 			dout1 => ram_char_do_1c,
 			cs1_n => '0', 
 			wr1_n => ram_char_we_n_1c,
@@ -347,8 +250,8 @@ begin
 		)
 		port map (
 			clk1  => clk,
-			addr1 => cpuAddr(10 downto 0),
-			din1  => cpuDIn,
+			addr1 => ram_adr(10 downto 0),
+			din1  => ram_data_in,
 			dout1 => ram_vid_do_1,
 			cs1_n => '0', 
 			wr1_n => ram_vid_we_n_1,
@@ -359,578 +262,5 @@ begin
 			dout2 => vid_ram_Data,
 			cs2_n => '0',
 			wr2_n => '1'
-		);
-	
-	-- rom filling from mra
-	-- address in
-	romAddr <= dn_addr(9 downto 0) when dn_wr = '1' else cpuAddr(9 downto 0);
-	-- we_n
-	rom_zre_00_we_n <= '0' when dn_addr(15 downto 10) = b"000001" and dn_wr = '1' else '1';
-	rom_zre_04_we_n <= '0' when dn_addr(15 downto 10) = b"000010" and dn_wr = '1' else '1';
-	rom_zre_08_we_n <= '0' when dn_addr(15 downto 10) = b"000011" and dn_wr = '1' else '1';
-	
-	rom_10_we_n		 <= '0' when dn_addr(15 downto 10) = b"000100" and dn_wr = '1' else '1';
-	rom_14_we_n		 <= '0' when dn_addr(15 downto 10) = b"000101" and dn_wr = '1' else '1';
-	rom_18_we_n		 <= '0' when dn_addr(15 downto 10) = b"000110" and dn_wr = '1' else '1';
-	rom_1c_we_n		 <= '0' when dn_addr(15 downto 10) = b"000111" and dn_wr = '1' else '1';
-	
-	rom_20_we_n		 <= '0' when dn_addr(15 downto 10) = b"001000" and dn_wr = '1' else '1';
-	rom_24_we_n		 <= '0' when dn_addr(15 downto 10) = b"001001" and dn_wr = '1' else '1';
-	rom_28_we_n		 <= '0' when dn_addr(15 downto 10) = b"001010" and dn_wr = '1' else '1';
-	rom_2c_we_n		 <= '0' when dn_addr(15 downto 10) = b"001011" and dn_wr = '1' else '1';
-	
-	rom_30_we_n		 <= '0' when dn_addr(15 downto 10) = b"001100" and dn_wr = '1' else '1';
-	rom_34_we_n		 <= '0' when dn_addr(15 downto 10) = b"001101" and dn_wr = '1' else '1';
-	rom_38_we_n		 <= '0' when dn_addr(15 downto 10) = b"001110" and dn_wr = '1' else '1';
-	rom_3c_we_n		 <= '0' when dn_addr(15 downto 10) = b"001111" and dn_wr = '1' else '1';
-	
-	rom_40_we_n		 <= '0' when dn_addr(15 downto 10) = b"010000" and dn_wr = '1' else '1';
-	rom_44_we_n		 <= '0' when dn_addr(15 downto 10) = b"010001" and dn_wr = '1' else '1';
-	rom_48_we_n		 <= '0' when dn_addr(15 downto 10) = b"010010" and dn_wr = '1' else '1';
-	rom_4c_we_n		 <= '0' when dn_addr(15 downto 10) = b"010011" and dn_wr = '1' else '1';
-	
-	rom_50_we_n		 <= '0' when dn_addr(15 downto 10) = b"010100" and dn_wr = '1' else '1';
-	rom_54_we_n		 <= '0' when dn_addr(15 downto 10) = b"010101" and dn_wr = '1' else '1';
-	rom_58_we_n		 <= '0' when dn_addr(15 downto 10) = b"010110" and dn_wr = '1' else '1';
-	rom_5c_we_n		 <= '0' when dn_addr(15 downto 10) = b"010111" and dn_wr = '1' else '1';
-	
-	rom_60_we_n		 <= '0' when dn_addr(15 downto 10) = b"011000" and dn_wr = '1' else '1';
-	rom_64_we_n		 <= '0' when dn_addr(15 downto 10) = b"011001" and dn_wr = '1' else '1';
-	rom_68_we_n		 <= '0' when dn_addr(15 downto 10) = b"011010" and dn_wr = '1' else '1';
-	rom_6c_we_n		 <= '0' when dn_addr(15 downto 10) = b"011011" and dn_wr = '1' else '1';
-	
-	rom_70_we_n		 <= '0' when dn_addr(15 downto 10) = b"011100" and dn_wr = '1' else '1';
-	rom_74_we_n		 <= '0' when dn_addr(15 downto 10) = b"011101" and dn_wr = '1' else '1';
-	rom_78_we_n		 <= '0' when dn_addr(15 downto 10) = b"011110" and dn_wr = '1' else '1';
-	rom_7c_we_n		 <= '0' when dn_addr(15 downto 10) = b"011111" and dn_wr = '1' else '1';
-	
-	rom_80_we_n		 <= '0' when dn_addr(15 downto 10) = b"100000" and dn_wr = '1' else '1';
-	rom_84_we_n		 <= '0' when dn_addr(15 downto 10) = b"100001" and dn_wr = '1' else '1';
-	rom_88_we_n		 <= '0' when dn_addr(15 downto 10) = b"100010" and dn_wr = '1' else '1';
-	rom_8c_we_n		 <= '0' when dn_addr(15 downto 10) = b"100011" and dn_wr = '1' else '1';
-
-	-- zre rom, 0000h - 03ffh, 1k
-	rom_zre_00 : entity work.sram
-		generic map (
-			AddrWidth => 10,
-			DataWidth => 8
-		)
-		port map (
-			clk  => clk,
-			addr => romAddr,
-			din  => dn_data,
-			dout => rom_zre_00_dat,
-			ce_n => '0', 
-			we_n => rom_zre_00_we_n
-		);
-	
-	-- zre rom, 0400h - 07ffh, 1k
-	rom_zre_04 : entity work.sram
-		generic map (
-			AddrWidth => 10,
-			DataWidth => 8
-		)
-		port map (
-			clk  => clk,
-			addr => romAddr,
-			din  => dn_data,
-			dout => rom_zre_04_dat,
-			ce_n => '0', 
-			we_n => rom_zre_04_we_n
-		);
-	
-	-- zre rom, 0800h - 0bffh, 1k
-	rom_zre_08 : entity work.sram
-		generic map (
-			AddrWidth => 10,
-			DataWidth => 8
-		)
-		port map (
-			clk  => clk,
-			addr => romAddr,
-			din  => dn_data,
-			dout => rom_zre_08_dat,
-			ce_n => '0', 
-			we_n => rom_zre_08_we_n
-		);
-	
-	-- pfs rom, 1000h - 13ffh, 1k
-	rom_10 : entity work.sram
-		generic map (
-			AddrWidth => 10,
-			DataWidth => 8
-		)
-		port map (
-			clk  => clk,
-			addr => romAddr,
-			din  => dn_data,
-			dout => rom_10_dat,
-			ce_n => '0', 
-			we_n => rom_10_we_n
-		);
-	
-	-- pfs rom, 1400h - 17ffh, 1k
-	rom_14 : entity work.sram
-		generic map (
-			AddrWidth => 10,
-			DataWidth => 8
-		)
-		port map (
-			clk  => clk,
-			addr => romAddr,
-			din  => dn_data,
-			dout => rom_14_dat,
-			ce_n => '0', 
-			we_n => rom_14_we_n
-		);
-		
-	-- pfs rom, 1800h - 1bffh, 1k
-	rom_18 : entity work.sram
-		generic map (
-			AddrWidth => 10,
-			DataWidth => 8
-		)
-		port map (
-			clk  => clk,
-			addr => romAddr,
-			din  => dn_data,
-			dout => rom_18_dat,
-			ce_n => '0', 
-			we_n => rom_18_we_n
-		);
-	
-	-- pfs rom, 1c00h - 1fffh, 1k
-	rom_1c : entity work.sram
-		generic map (
-			AddrWidth => 10,
-			DataWidth => 8
-		)
-		port map (
-			clk  => clk,
-			addr => romAddr,
-			din  => dn_data,
-			dout => rom_1c_dat,
-			ce_n => '0', 
-			we_n => rom_1c_we_n
-		);
-		
-	-- pfs rom, 2000h - 23ffh, 1k
-	rom_20 : entity work.sram
-		generic map (
-			AddrWidth => 10,
-			DataWidth => 8
-		)
-		port map (
-			clk  => clk,
-			addr => romAddr,
-			din  => dn_data,
-			dout => rom_20_dat,
-			ce_n => '0', 
-			we_n => rom_20_we_n
-		);
-	
-	-- pfs rom, 2400h - 27ffh, 1k
-	rom_24 : entity work.sram
-		generic map (
-			AddrWidth => 10,
-			DataWidth => 8
-		)
-		port map (
-			clk  => clk,
-			addr => romAddr,
-			din  => dn_data,
-			dout => rom_24_dat,
-			ce_n => '0', 
-			we_n => rom_24_we_n
-		);
-		
-	-- pfs rom, 2800h - 2bffh, 1k
-	rom_28 : entity work.sram
-		generic map (
-			AddrWidth => 10,
-			DataWidth => 8
-		)
-		port map (
-			clk  => clk,
-			addr => romAddr,
-			din  => dn_data,
-			dout => rom_28_dat,
-			ce_n => '0', 
-			we_n => rom_28_we_n
-		);
-	
-	-- pfs rom, 2c00h - 2fffh, 1k
-	rom_2c : entity work.sram
-		generic map (
-			AddrWidth => 10,
-			DataWidth => 8
-		)
-		port map (
-			clk  => clk,
-			addr => romAddr,
-			din  => dn_data,
-			dout => rom_2c_dat,
-			ce_n => '0', 
-			we_n => rom_2c_we_n
-		);
-		
-	-- pfs rom, 3000h - 33ffh, 1k
-	rom_30 : entity work.sram
-		generic map (
-			AddrWidth => 10,
-			DataWidth => 8
-		)
-		port map (
-			clk  => clk,
-			addr => romAddr,
-			din  => dn_data,
-			dout => rom_30_dat,
-			ce_n => '0', 
-			we_n => rom_30_we_n
-		);
-		
-	-- pfs rom, 3400h - 37ffh, 1k
-	rom_34 : entity work.sram
-		generic map (
-			AddrWidth => 10,
-			DataWidth => 8
-		)
-		port map (
-			clk  => clk,
-			addr => romAddr,
-			din  => dn_data,
-			dout => rom_34_dat,
-			ce_n => '0', 
-			we_n => rom_34_we_n
-		);
-		
-	-- pfs rom, 3800h - 3bffh, 1k
-	rom_38 : entity work.sram
-		generic map (
-			AddrWidth => 10,
-			DataWidth => 8
-		)
-		port map (
-			clk  => clk,
-			addr => romAddr,
-			din  => dn_data,
-			dout => rom_38_dat,
-			ce_n => '0', 
-			we_n => rom_38_we_n
-		);
-	
-	-- pfs rom, 3c00h - 3fffh, 1k
-	rom_3c : entity work.sram
-		generic map (
-			AddrWidth => 10,
-			DataWidth => 8
-		)
-		port map (
-			clk  => clk,
-			addr => romAddr,
-			din  => dn_data,
-			dout => rom_3c_dat,
-			ce_n => '0', 
-			we_n => rom_3c_we_n
-		);
-	
-	-- pfs rom, 4000h - 43ffh, 1k
-	rom_40 : entity work.sram
-		generic map (
-			AddrWidth => 10,
-			DataWidth => 8
-		)
-		port map (
-			clk  => clk,
-			addr => romAddr,
-			din  => dn_data,
-			dout => rom_40_dat,
-			ce_n => '0', 
-			we_n => rom_40_we_n
-		);
-	
-	-- pfs rom, 4400h - 47ffh, 1k
-	rom_44 : entity work.sram
-		generic map (
-			AddrWidth => 10,
-			DataWidth => 8
-		)
-		port map (
-			clk  => clk,
-			addr => romAddr,
-			din  => dn_data,
-			dout => rom_44_dat,
-			ce_n => '0', 
-			we_n => rom_44_we_n
-		);
-		
-	-- pfs rom, 4800h - 4bffh, 1k
-	rom_48 : entity work.sram
-		generic map (
-			AddrWidth => 10,
-			DataWidth => 8
-		)
-		port map (
-			clk  => clk,
-			addr => romAddr,
-			din  => dn_data,
-			dout => rom_48_dat,
-			ce_n => '0', 
-			we_n => rom_48_we_n
-		);
-	
-	-- pfs rom, 4c00h - 4fffh, 1k
-	rom_4c : entity work.sram
-		generic map (
-			AddrWidth => 10,
-			DataWidth => 8
-		)
-		port map (
-			clk  => clk,
-			addr => romAddr,
-			din  => dn_data,
-			dout => rom_4c_dat,
-			ce_n => '0', 
-			we_n => rom_4c_we_n
-		);
-	
-	-- pfs rom, 5000h - 53ffh, 1k
-	rom_50 : entity work.sram
-		generic map (
-			AddrWidth => 10,
-			DataWidth => 8
-		)
-		port map (
-			clk  => clk,
-			addr => romAddr,
-			din  => dn_data,
-			dout => rom_50_dat,
-			ce_n => '0', 
-			we_n => rom_50_we_n
-		);
-	
-	-- pfs rom, 5400h - 57ffh, 1k
-	rom_54 : entity work.sram
-		generic map (
-			AddrWidth => 10,
-			DataWidth => 8
-		)
-		port map (
-			clk  => clk,
-			addr => romAddr,
-			din  => dn_data,
-			dout => rom_54_dat,
-			ce_n => '0', 
-			we_n => rom_54_we_n
-		);
-		
-	-- pfs rom, 5800h - 5bffh, 1k
-	rom_58 : entity work.sram
-		generic map (
-			AddrWidth => 10,
-			DataWidth => 8
-		)
-		port map (
-			clk  => clk,
-			addr => romAddr,
-			din  => dn_data,
-			dout => rom_58_dat,
-			ce_n => '0', 
-			we_n => rom_58_we_n
-		);
-	
-	-- pfs rom, 5c00h - 5fffh, 1k
-	rom_5c : entity work.sram
-		generic map (
-			AddrWidth => 10,
-			DataWidth => 8
-		)
-		port map (
-			clk  => clk,
-			addr => romAddr,
-			din  => dn_data,
-			dout => rom_5c_dat,
-			ce_n => '0', 
-			we_n => rom_5c_we_n
-		);
-	
-	-- pfs rom, 6000h - 63ffh, 1k
-	rom_60 : entity work.sram
-		generic map (
-			AddrWidth => 10,
-			DataWidth => 8
-		)
-		port map (
-			clk  => clk,
-			addr => romAddr,
-			din  => dn_data,
-			dout => rom_60_dat,
-			ce_n => '0', 
-			we_n => rom_60_we_n
-		);
-	
-	-- pfs rom, 6400h - 67ffh, 1k
-	rom_64 : entity work.sram
-		generic map (
-			AddrWidth => 10,
-			DataWidth => 8
-		)
-		port map (
-			clk  => clk,
-			addr => romAddr,
-			din  => dn_data,
-			dout => rom_64_dat,
-			ce_n => '0', 
-			we_n => rom_64_we_n
-		);
-		
-	-- pfs rom, 6800h - 6bffh, 1k
-	rom_68 : entity work.sram
-		generic map (
-			AddrWidth => 10,
-			DataWidth => 8
-		)
-		port map (
-			clk  => clk,
-			addr => romAddr,
-			din  => dn_data,
-			dout => rom_68_dat,
-			ce_n => '0', 
-			we_n => rom_68_we_n
-		);
-	
-	-- pfs rom, 6c00h - 6fffh, 1k
-	rom_6c : entity work.sram
-		generic map (
-			AddrWidth => 10,
-			DataWidth => 8
-		)
-		port map (
-			clk  => clk,
-			addr => romAddr,
-			din  => dn_data,
-			dout => rom_6c_dat,
-			ce_n => '0', 
-			we_n => rom_6c_we_n
-		);
-	
-	-- pfs rom, 7000h - 73ffh, 1k
-	rom_70 : entity work.sram
-		generic map (
-			AddrWidth => 10,
-			DataWidth => 8
-		)
-		port map (
-			clk  => clk,
-			addr => romAddr,
-			din  => dn_data,
-			dout => rom_70_dat,
-			ce_n => '0', 
-			we_n => rom_70_we_n
-		);
-	
-	-- pfs rom, 7400h - 77ffh, 1k
-	rom_74 : entity work.sram
-		generic map (
-			AddrWidth => 10,
-			DataWidth => 8
-		)
-		port map (
-			clk  => clk,
-			addr => romAddr,
-			din  => dn_data,
-			dout => rom_74_dat,
-			ce_n => '0', 
-			we_n => rom_74_we_n
-		);
-		
-	-- pfs rom, 7800h - 7bffh, 1k
-	rom_78 : entity work.sram
-		generic map (
-			AddrWidth => 10,
-			DataWidth => 8
-		)
-		port map (
-			clk  => clk,
-			addr => romAddr,
-			din  => dn_data,
-			dout => rom_78_dat,
-			ce_n => '0', 
-			we_n => rom_78_we_n
-		);
-	
-	-- pfs rom, 7c00h - 7fffh, 1k
-	rom_7c : entity work.sram
-		generic map (
-			AddrWidth => 10,
-			DataWidth => 8
-		)
-		port map (
-			clk  => clk,
-			addr => romAddr,
-			din  => dn_data,
-			dout => rom_7c_dat,
-			ce_n => '0', 
-			we_n => rom_7c_we_n
-		);
-	
-	-- pfs rom, 8000h - 83ffh, 1k
-	rom_80 : entity work.sram
-		generic map (
-			AddrWidth => 10,
-			DataWidth => 8
-		)
-		port map (
-			clk  => clk,
-			addr => romAddr,
-			din  => dn_data,
-			dout => rom_80_dat,
-			ce_n => '0',
-			we_n => rom_80_we_n
-		);
-	
-	-- pfs rom, 8400h - 87ffh, 1k
-	rom_84 : entity work.sram
-		generic map (
-			AddrWidth => 10,
-			DataWidth => 8
-		)
-		port map (
-			clk  => clk,
-			addr => romAddr,
-			din  => dn_data,
-			dout => rom_84_dat,
-			ce_n => '0', 
-			we_n => rom_84_we_n
-		);
-		
-	-- pfs rom, 8800h - 8bffh, 1k
-	rom_88 : entity work.sram
-		generic map (
-			AddrWidth => 10,
-			DataWidth => 8
-		)
-		port map (
-			clk  => clk,
-			addr => romAddr,
-			din  => dn_data,
-			dout => rom_88_dat,
-			ce_n => '0', 
-			we_n => rom_88_we_n
-		);
-	
-	-- pfs rom, 8c00h - 8fffh, 1k
-	rom_8c : entity work.sram
-		generic map (
-			AddrWidth => 10,
-			DataWidth => 8
-		)
-		port map (
-			clk  => clk,
-			addr => romAddr,
-			din  => dn_data,
-			dout => rom_8c_dat,
-			ce_n => '0', 
-			we_n => rom_8c_we_n
 		);
 end;

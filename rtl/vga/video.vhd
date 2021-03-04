@@ -73,7 +73,8 @@ entity video is
 		
 		dn_addr			: in std_logic_vector(15 downto 0);
 		dn_data			: in std_logic_vector(7 downto 0);
-		dn_wr				: in std_logic
+		dn_wr				: in std_logic;
+		tno				: in std_logic_vector(7 downto 0)
 	); 
 end video;
 
@@ -176,9 +177,6 @@ begin
 			red   <= (others => outputc(7));
 			green <= (others => outputb(7));
 			blue  <= (others => outputa(7));
---				red   <= std_logic_vector(to_unsigned(countH, 8));
---				green <= std_logic_vector(to_unsigned(countV, 8));
---				blue  <= x"00";
 		else
 			red   <= (others => '0');
 			green <= (others => '0');
@@ -187,7 +185,9 @@ begin
 	end process;
  
 	-- character rom, e800h - ebffh, 1k
-	cg_rom_cs <= '0' when dn_addr(15 downto 10) = b"000000" else '1';
+	cg_rom_cs <= '0' when dn_addr(15 downto 10) = b"000000" and tno = x"00" else	-- polyplay
+					 '0' when dn_addr(15 downto 10) = b"110000" and tno = x"01" else	-- polyplay 2
+					 '1';
 	rom_char : entity work.dualsram
 		generic map (
 			AddrWidth => 10

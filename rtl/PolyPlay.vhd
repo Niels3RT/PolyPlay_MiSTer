@@ -65,7 +65,8 @@ entity PolyPlay is
 		
 		dn_addr			: in std_logic_vector(15 downto 0);
 		dn_data			: in std_logic_vector(7 downto 0);
-		dn_wr				: in std_logic
+		dn_wr				: in std_logic;
+		tno				: in std_logic_vector(7 downto 0)
     );
 end PolyPlay;
 
@@ -137,7 +138,8 @@ begin
 
 	-- reset
 	cpuReset_n <= '0' when resetDelay /= 0 else '1';
-	LED_USER <= cpuReset_n;
+	--LED_USER <= cpuReset_n;
+	LED_USER <= tno(0);
 
 	reset : process
 	begin
@@ -176,7 +178,8 @@ begin
 			
 			dn_addr => dn_addr,
 			dn_data => dn_data,
-			dn_wr   => dn_wr
+			dn_wr   => dn_wr,
+			tno     => tno
 		);
 
 	-- memory controller
@@ -210,7 +213,8 @@ begin
 			
 			dn_addr => dn_addr,
 			dn_data => dn_data,
-			dn_wr   => dn_wr
+			dn_wr   => dn_wr,
+			tno     => tno
 		);
 
 	-- CPU data-in multiplexer

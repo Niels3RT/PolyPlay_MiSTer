@@ -1,12 +1,16 @@
 <misterromdescription>
 	<name>Poly Play</name>
 	<mameversion>0229</mameversion>
-	<setname>polyplay</setname>
+	<setname>Poly Play</setname>
 	<mratimestamp>20210304072300</mratimestamp>
 	<year>1985</year>
 	<manufacturer>VEB Polytechnik</manufacturer>
 	<category>Action</category>
 	<rbf>PolyPlay</rbf>
+
+	<rom index="1">
+		<part>00</part>
+	</rom>
 
 	<rom index="0" zip="polyplay.zip" md5="e1fd6666eb78b1e6cfaf0e9ef6da5836">
 		<part crc="5242DD6B" name="char.1"/>

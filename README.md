@@ -12,7 +12,7 @@ See https://en.wikipedia.org/wiki/Poly_Play
 
 There is a lot of guesswork going on (clocks, video). Tested on HDMI output only, analog video hopefully soon.
 
-The romset (polyplay.zip) should come from mame 0229.
+The romsets (polyplay.zip/polyplay2.zip) should come from mame 0229.
 
 First button is fire, second button coin.
 

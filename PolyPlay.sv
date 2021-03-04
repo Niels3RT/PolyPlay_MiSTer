@@ -186,8 +186,6 @@ assign BUTTONS = 0;
 
 //////////////////////////////////////////////////////////////////
 
-//assign VIDEO_ARX = 4;
-//assign VIDEO_ARY = 3;
 wire [1:0] ar    = status[2:1];
 assign VIDEO_ARX = (!ar) ? 12'd4 : (ar - 1'd1);
 assign VIDEO_ARY = (!ar) ? 12'd3 : 12'd0;
@@ -214,6 +212,7 @@ wire [31:0] joystick_0;
 wire        ioctl_wr;
 wire [24:0] ioctl_addr;
 wire  [7:0] ioctl_dout;
+wire  [7:0] ioctl_index;
 
 hps_io #(.STRLEN($size(CONF_STR)>>3)) hps_io
 (
@@ -232,7 +231,8 @@ hps_io #(.STRLEN($size(CONF_STR)>>3)) hps_io
 	
 	.ioctl_wr(ioctl_wr),
 	.ioctl_addr(ioctl_addr),
-	.ioctl_dout(ioctl_dout)
+	.ioctl_dout(ioctl_dout),
+	.ioctl_index(ioctl_index)
 );
 
 ///////////////////////   CLOCKS   ///////////////////////////////
@@ -258,6 +258,12 @@ wire HSync;
 wire VBlank;
 wire VSync;
 wire [7:0] video;
+reg  [7:0] tno = 0;
+
+// Retrieve Title No.
+always @(posedge clk_sys) begin
+   if (ioctl_wr & (ioctl_index==1)) tno <= ioctl_dout;
+end
 
 PolyPlay PolyPlay
 (
@@ -289,7 +295,8 @@ PolyPlay PolyPlay
 	
 	.dn_addr(ioctl_addr[15:0]),
 	.dn_data(ioctl_dout),
-	.dn_wr(ioctl_wr)
+	.dn_wr(ioctl_wr && !ioctl_index),
+	.tno(tno)
 );
 
 assign CLK_VIDEO = clk_vga;
