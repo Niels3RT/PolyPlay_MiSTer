@@ -12,7 +12,7 @@
 		<part>01</part>
 	</rom>
 
-	<rom index="0" zip="polyplay2.zip" md5="none">
+	<rom index="0" zip="polyplay2.zip" md5="540e7445be24df2087e2f50936a0e732">
 		<part crc="BF22F44F" name="2_1.bin"/>
 		<part crc="E54B8BE8" name="2_2.bin"/>
 		<part crc="AC43EC6B" name="2_3.bin"/>
