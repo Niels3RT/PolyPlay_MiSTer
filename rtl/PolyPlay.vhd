@@ -61,7 +61,11 @@ entity PolyPlay is
 		LED_POWER		: out std_logic_vector(1 downto 0);
 		LED_DISK			: out std_logic_vector(1 downto 0);
 		
-		USER_OUT			: out std_logic_vector(6 downto 0)
+		USER_OUT			: out std_logic_vector(6 downto 0);
+		
+		dn_addr			: in std_logic_vector(15 downto 0);
+		dn_data			: in std_logic_vector(7 downto 0);
+		dn_wr				: in std_logic
     );
 end PolyPlay;
 
@@ -154,6 +158,7 @@ begin
 	video : entity work.video
 		port map (
 			clk    => vgaclk,
+			cpuclk => cpuclk,
 			red    => VGA_R,
 			green  => VGA_G,
 			blue   => VGA_B,
@@ -167,7 +172,11 @@ begin
 			cg_ram_Datab => cg_ram_Datab,
 			cg_ram_Datac => cg_ram_Datac,
 			vid_ram_Addr => vid_ram_Addr,
-			vid_ram_Data => vid_ram_Data
+			vid_ram_Data => vid_ram_Data,
+			
+			dn_addr => dn_addr,
+			dn_data => dn_data,
+			dn_wr   => dn_wr
 		);
 
 	-- memory controller
@@ -197,7 +206,11 @@ begin
 			cg_ram_Datab => cg_ram_Datab,
 			cg_ram_Datac => cg_ram_Datac,
 			vid_ram_Addr => vid_ram_Addr,
-			vid_ram_Data => vid_ram_Data
+			vid_ram_Data => vid_ram_Data,
+			
+			dn_addr => dn_addr,
+			dn_data => dn_data,
+			dn_wr   => dn_wr
 		);
 
 	-- CPU data-in multiplexer

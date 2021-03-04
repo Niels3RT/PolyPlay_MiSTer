@@ -55,8 +55,11 @@ entity memcontrol is
 	cg_ram_Datab	: out std_logic_vector(7 downto 0);
 	cg_ram_Datac	: out std_logic_vector(7 downto 0);
 	vid_ram_Addr	: in  std_logic_vector(10 downto 0);
-	vid_ram_Data	: out std_logic_vector(7 downto 0)
-		
+	vid_ram_Data	: out std_logic_vector(7 downto 0);
+	
+	dn_addr			: in std_logic_vector(15 downto 0);
+	dn_data			: in std_logic_vector(7 downto 0);
+	dn_wr				: in std_logic
 	);
 end memcontrol;
 
@@ -88,6 +91,7 @@ architecture rtl of memcontrol is
 	signal ram_vid_we_n_1	: std_logic;
 	
 	-- roms
+	signal romAddr				: std_logic_vector(9 downto 0);
 	signal rom_zre_00_dat	: std_logic_vector(7 downto 0);
 	signal rom_zre_04_dat	: std_logic_vector(7 downto 0);
 	signal rom_zre_08_dat	: std_logic_vector(7 downto 0);
@@ -123,6 +127,43 @@ architecture rtl of memcontrol is
 	signal rom_84_dat			: std_logic_vector(7 downto 0);
 	signal rom_88_dat			: std_logic_vector(7 downto 0);
 	signal rom_8c_dat			: std_logic_vector(7 downto 0);
+	
+	-- rom loading from mra
+	signal rom_zre_00_we_n	: std_logic;
+	signal rom_zre_04_we_n	: std_logic;
+	signal rom_zre_08_we_n	: std_logic;
+	signal rom_10_we_n		: std_logic;
+	signal rom_14_we_n		: std_logic;
+	signal rom_18_we_n		: std_logic;
+	signal rom_1c_we_n		: std_logic;
+	signal rom_20_we_n		: std_logic;
+	signal rom_24_we_n		: std_logic;
+	signal rom_28_we_n		: std_logic;
+	signal rom_2c_we_n		: std_logic;
+	signal rom_30_we_n		: std_logic;
+	signal rom_34_we_n		: std_logic;
+	signal rom_38_we_n		: std_logic;
+	signal rom_3c_we_n		: std_logic;
+	signal rom_40_we_n		: std_logic;
+	signal rom_44_we_n		: std_logic;
+	signal rom_48_we_n		: std_logic;
+	signal rom_4c_we_n		: std_logic;
+	signal rom_50_we_n		: std_logic;
+	signal rom_54_we_n		: std_logic;
+	signal rom_58_we_n		: std_logic;
+	signal rom_5c_we_n		: std_logic;
+	signal rom_60_we_n		: std_logic;
+	signal rom_64_we_n		: std_logic;
+	signal rom_68_we_n		: std_logic;
+	signal rom_6c_we_n		: std_logic;
+	signal rom_70_we_n		: std_logic;
+	signal rom_74_we_n		: std_logic;
+	signal rom_78_we_n		: std_logic;
+	signal rom_7c_we_n		: std_logic;
+	signal rom_80_we_n		: std_logic;
+	signal rom_84_we_n		: std_logic;
+	signal rom_88_we_n		: std_logic;
+	signal rom_8c_we_n		: std_logic;
 
 begin
 	
@@ -319,284 +360,577 @@ begin
 			cs2_n => '0',
 			wr2_n => '1'
 		);
+	
+	-- rom filling from mra
+	-- address in
+	romAddr <= dn_addr(9 downto 0) when dn_wr = '1' else cpuAddr(9 downto 0);
+	-- we_n
+	rom_zre_00_we_n <= '0' when dn_addr(15 downto 10) = b"000001" and dn_wr = '1' else '1';
+	rom_zre_04_we_n <= '0' when dn_addr(15 downto 10) = b"000010" and dn_wr = '1' else '1';
+	rom_zre_08_we_n <= '0' when dn_addr(15 downto 10) = b"000011" and dn_wr = '1' else '1';
+	
+	rom_10_we_n		 <= '0' when dn_addr(15 downto 10) = b"000100" and dn_wr = '1' else '1';
+	rom_14_we_n		 <= '0' when dn_addr(15 downto 10) = b"000101" and dn_wr = '1' else '1';
+	rom_18_we_n		 <= '0' when dn_addr(15 downto 10) = b"000110" and dn_wr = '1' else '1';
+	rom_1c_we_n		 <= '0' when dn_addr(15 downto 10) = b"000111" and dn_wr = '1' else '1';
+	
+	rom_20_we_n		 <= '0' when dn_addr(15 downto 10) = b"001000" and dn_wr = '1' else '1';
+	rom_24_we_n		 <= '0' when dn_addr(15 downto 10) = b"001001" and dn_wr = '1' else '1';
+	rom_28_we_n		 <= '0' when dn_addr(15 downto 10) = b"001010" and dn_wr = '1' else '1';
+	rom_2c_we_n		 <= '0' when dn_addr(15 downto 10) = b"001011" and dn_wr = '1' else '1';
+	
+	rom_30_we_n		 <= '0' when dn_addr(15 downto 10) = b"001100" and dn_wr = '1' else '1';
+	rom_34_we_n		 <= '0' when dn_addr(15 downto 10) = b"001101" and dn_wr = '1' else '1';
+	rom_38_we_n		 <= '0' when dn_addr(15 downto 10) = b"001110" and dn_wr = '1' else '1';
+	rom_3c_we_n		 <= '0' when dn_addr(15 downto 10) = b"001111" and dn_wr = '1' else '1';
+	
+	rom_40_we_n		 <= '0' when dn_addr(15 downto 10) = b"010000" and dn_wr = '1' else '1';
+	rom_44_we_n		 <= '0' when dn_addr(15 downto 10) = b"010001" and dn_wr = '1' else '1';
+	rom_48_we_n		 <= '0' when dn_addr(15 downto 10) = b"010010" and dn_wr = '1' else '1';
+	rom_4c_we_n		 <= '0' when dn_addr(15 downto 10) = b"010011" and dn_wr = '1' else '1';
+	
+	rom_50_we_n		 <= '0' when dn_addr(15 downto 10) = b"010100" and dn_wr = '1' else '1';
+	rom_54_we_n		 <= '0' when dn_addr(15 downto 10) = b"010101" and dn_wr = '1' else '1';
+	rom_58_we_n		 <= '0' when dn_addr(15 downto 10) = b"010110" and dn_wr = '1' else '1';
+	rom_5c_we_n		 <= '0' when dn_addr(15 downto 10) = b"010111" and dn_wr = '1' else '1';
+	
+	rom_60_we_n		 <= '0' when dn_addr(15 downto 10) = b"011000" and dn_wr = '1' else '1';
+	rom_64_we_n		 <= '0' when dn_addr(15 downto 10) = b"011001" and dn_wr = '1' else '1';
+	rom_68_we_n		 <= '0' when dn_addr(15 downto 10) = b"011010" and dn_wr = '1' else '1';
+	rom_6c_we_n		 <= '0' when dn_addr(15 downto 10) = b"011011" and dn_wr = '1' else '1';
+	
+	rom_70_we_n		 <= '0' when dn_addr(15 downto 10) = b"011100" and dn_wr = '1' else '1';
+	rom_74_we_n		 <= '0' when dn_addr(15 downto 10) = b"011101" and dn_wr = '1' else '1';
+	rom_78_we_n		 <= '0' when dn_addr(15 downto 10) = b"011110" and dn_wr = '1' else '1';
+	rom_7c_we_n		 <= '0' when dn_addr(15 downto 10) = b"011111" and dn_wr = '1' else '1';
+	
+	rom_80_we_n		 <= '0' when dn_addr(15 downto 10) = b"100000" and dn_wr = '1' else '1';
+	rom_84_we_n		 <= '0' when dn_addr(15 downto 10) = b"100001" and dn_wr = '1' else '1';
+	rom_88_we_n		 <= '0' when dn_addr(15 downto 10) = b"100010" and dn_wr = '1' else '1';
+	rom_8c_we_n		 <= '0' when dn_addr(15 downto 10) = b"100011" and dn_wr = '1' else '1';
 
 	-- zre rom, 0000h - 03ffh, 1k
-	rom_zre_00 : entity work.rom_zre_0000
+	rom_zre_00 : entity work.sram
+		generic map (
+			AddrWidth => 10,
+			DataWidth => 8
+		)
 		port map (
-			clk => clk,
-			addr => cpuAddr(9 downto 0),
-			data => rom_zre_00_dat
+			clk  => clk,
+			addr => romAddr,
+			din  => dn_data,
+			dout => rom_zre_00_dat,
+			ce_n => '0', 
+			we_n => rom_zre_00_we_n
 		);
 	
 	-- zre rom, 0400h - 07ffh, 1k
-	rom_zre_04 : entity work.rom_zre_0400
+	rom_zre_04 : entity work.sram
+		generic map (
+			AddrWidth => 10,
+			DataWidth => 8
+		)
 		port map (
-			clk => clk,
-			addr => cpuAddr(9 downto 0),
-			data => rom_zre_04_dat
+			clk  => clk,
+			addr => romAddr,
+			din  => dn_data,
+			dout => rom_zre_04_dat,
+			ce_n => '0', 
+			we_n => rom_zre_04_we_n
 		);
 	
 	-- zre rom, 0800h - 0bffh, 1k
-	rom_zre_08 : entity work.rom_zre_0800
+	rom_zre_08 : entity work.sram
+		generic map (
+			AddrWidth => 10,
+			DataWidth => 8
+		)
 		port map (
-			clk => clk,
-			addr => cpuAddr(9 downto 0),
-			data => rom_zre_08_dat
+			clk  => clk,
+			addr => romAddr,
+			din  => dn_data,
+			dout => rom_zre_08_dat,
+			ce_n => '0', 
+			we_n => rom_zre_08_we_n
 		);
 	
 	-- pfs rom, 1000h - 13ffh, 1k
-	rom_10 : entity work.rom2_1000
+	rom_10 : entity work.sram
+		generic map (
+			AddrWidth => 10,
+			DataWidth => 8
+		)
 		port map (
-			clk => clk,
-			addr => cpuAddr(9 downto 0),
-			data => rom_10_dat
+			clk  => clk,
+			addr => romAddr,
+			din  => dn_data,
+			dout => rom_10_dat,
+			ce_n => '0', 
+			we_n => rom_10_we_n
 		);
 	
 	-- pfs rom, 1400h - 17ffh, 1k
-	rom_14 : entity work.rom2_1400
+	rom_14 : entity work.sram
+		generic map (
+			AddrWidth => 10,
+			DataWidth => 8
+		)
 		port map (
-			clk => clk,
-			addr => cpuAddr(9 downto 0),
-			data => rom_14_dat
+			clk  => clk,
+			addr => romAddr,
+			din  => dn_data,
+			dout => rom_14_dat,
+			ce_n => '0', 
+			we_n => rom_14_we_n
 		);
 		
 	-- pfs rom, 1800h - 1bffh, 1k
-	rom_18 : entity work.rom2_1800
+	rom_18 : entity work.sram
+		generic map (
+			AddrWidth => 10,
+			DataWidth => 8
+		)
 		port map (
-			clk => clk,
-			addr => cpuAddr(9 downto 0),
-			data => rom_18_dat
+			clk  => clk,
+			addr => romAddr,
+			din  => dn_data,
+			dout => rom_18_dat,
+			ce_n => '0', 
+			we_n => rom_18_we_n
 		);
 	
 	-- pfs rom, 1c00h - 1fffh, 1k
-	rom_1c : entity work.rom2_1c00
+	rom_1c : entity work.sram
+		generic map (
+			AddrWidth => 10,
+			DataWidth => 8
+		)
 		port map (
-			clk => clk,
-			addr => cpuAddr(9 downto 0),
-			data => rom_1c_dat
+			clk  => clk,
+			addr => romAddr,
+			din  => dn_data,
+			dout => rom_1c_dat,
+			ce_n => '0', 
+			we_n => rom_1c_we_n
 		);
 		
 	-- pfs rom, 2000h - 23ffh, 1k
-	rom_20 : entity work.rom2_2000
+	rom_20 : entity work.sram
+		generic map (
+			AddrWidth => 10,
+			DataWidth => 8
+		)
 		port map (
-			clk => clk,
-			addr => cpuAddr(9 downto 0),
-			data => rom_20_dat
+			clk  => clk,
+			addr => romAddr,
+			din  => dn_data,
+			dout => rom_20_dat,
+			ce_n => '0', 
+			we_n => rom_20_we_n
 		);
 	
 	-- pfs rom, 2400h - 27ffh, 1k
-	rom_24 : entity work.rom2_2400
+	rom_24 : entity work.sram
+		generic map (
+			AddrWidth => 10,
+			DataWidth => 8
+		)
 		port map (
-			clk => clk,
-			addr => cpuAddr(9 downto 0),
-			data => rom_24_dat
+			clk  => clk,
+			addr => romAddr,
+			din  => dn_data,
+			dout => rom_24_dat,
+			ce_n => '0', 
+			we_n => rom_24_we_n
 		);
 		
 	-- pfs rom, 2800h - 2bffh, 1k
-	rom_28 : entity work.rom2_2800
+	rom_28 : entity work.sram
+		generic map (
+			AddrWidth => 10,
+			DataWidth => 8
+		)
 		port map (
-			clk => clk,
-			addr => cpuAddr(9 downto 0),
-			data => rom_28_dat
+			clk  => clk,
+			addr => romAddr,
+			din  => dn_data,
+			dout => rom_28_dat,
+			ce_n => '0', 
+			we_n => rom_28_we_n
 		);
 	
 	-- pfs rom, 2c00h - 2fffh, 1k
-	rom_2c : entity work.rom2_2c00
+	rom_2c : entity work.sram
+		generic map (
+			AddrWidth => 10,
+			DataWidth => 8
+		)
 		port map (
-			clk => clk,
-			addr => cpuAddr(9 downto 0),
-			data => rom_2c_dat
+			clk  => clk,
+			addr => romAddr,
+			din  => dn_data,
+			dout => rom_2c_dat,
+			ce_n => '0', 
+			we_n => rom_2c_we_n
 		);
 		
 	-- pfs rom, 3000h - 33ffh, 1k
-	rom_30 : entity work.rom2_3000
+	rom_30 : entity work.sram
+		generic map (
+			AddrWidth => 10,
+			DataWidth => 8
+		)
 		port map (
-			clk => clk,
-			addr => cpuAddr(9 downto 0),
-			data => rom_30_dat
+			clk  => clk,
+			addr => romAddr,
+			din  => dn_data,
+			dout => rom_30_dat,
+			ce_n => '0', 
+			we_n => rom_30_we_n
 		);
-	
+		
 	-- pfs rom, 3400h - 37ffh, 1k
-	rom_34 : entity work.rom2_3400
+	rom_34 : entity work.sram
+		generic map (
+			AddrWidth => 10,
+			DataWidth => 8
+		)
 		port map (
-			clk => clk,
-			addr => cpuAddr(9 downto 0),
-			data => rom_34_dat
+			clk  => clk,
+			addr => romAddr,
+			din  => dn_data,
+			dout => rom_34_dat,
+			ce_n => '0', 
+			we_n => rom_34_we_n
 		);
 		
 	-- pfs rom, 3800h - 3bffh, 1k
-	rom_38 : entity work.rom2_3800
+	rom_38 : entity work.sram
+		generic map (
+			AddrWidth => 10,
+			DataWidth => 8
+		)
 		port map (
-			clk => clk,
-			addr => cpuAddr(9 downto 0),
-			data => rom_38_dat
+			clk  => clk,
+			addr => romAddr,
+			din  => dn_data,
+			dout => rom_38_dat,
+			ce_n => '0', 
+			we_n => rom_38_we_n
 		);
 	
 	-- pfs rom, 3c00h - 3fffh, 1k
-	rom_3c : entity work.rom2_3c00
+	rom_3c : entity work.sram
+		generic map (
+			AddrWidth => 10,
+			DataWidth => 8
+		)
 		port map (
-			clk => clk,
-			addr => cpuAddr(9 downto 0),
-			data => rom_3c_dat
+			clk  => clk,
+			addr => romAddr,
+			din  => dn_data,
+			dout => rom_3c_dat,
+			ce_n => '0', 
+			we_n => rom_3c_we_n
 		);
 	
 	-- pfs rom, 4000h - 43ffh, 1k
-	rom_40 : entity work.rom2_4000
+	rom_40 : entity work.sram
+		generic map (
+			AddrWidth => 10,
+			DataWidth => 8
+		)
 		port map (
-			clk => clk,
-			addr => cpuAddr(9 downto 0),
-			data => rom_40_dat
+			clk  => clk,
+			addr => romAddr,
+			din  => dn_data,
+			dout => rom_40_dat,
+			ce_n => '0', 
+			we_n => rom_40_we_n
 		);
 	
 	-- pfs rom, 4400h - 47ffh, 1k
-	rom_44 : entity work.rom2_4400
+	rom_44 : entity work.sram
+		generic map (
+			AddrWidth => 10,
+			DataWidth => 8
+		)
 		port map (
-			clk => clk,
-			addr => cpuAddr(9 downto 0),
-			data => rom_44_dat
+			clk  => clk,
+			addr => romAddr,
+			din  => dn_data,
+			dout => rom_44_dat,
+			ce_n => '0', 
+			we_n => rom_44_we_n
 		);
 		
 	-- pfs rom, 4800h - 4bffh, 1k
-	rom_48 : entity work.rom2_4800
+	rom_48 : entity work.sram
+		generic map (
+			AddrWidth => 10,
+			DataWidth => 8
+		)
 		port map (
-			clk => clk,
-			addr => cpuAddr(9 downto 0),
-			data => rom_48_dat
+			clk  => clk,
+			addr => romAddr,
+			din  => dn_data,
+			dout => rom_48_dat,
+			ce_n => '0', 
+			we_n => rom_48_we_n
 		);
 	
 	-- pfs rom, 4c00h - 4fffh, 1k
-	rom_4c : entity work.rom2_4c00
+	rom_4c : entity work.sram
+		generic map (
+			AddrWidth => 10,
+			DataWidth => 8
+		)
 		port map (
-			clk => clk,
-			addr => cpuAddr(9 downto 0),
-			data => rom_4c_dat
+			clk  => clk,
+			addr => romAddr,
+			din  => dn_data,
+			dout => rom_4c_dat,
+			ce_n => '0', 
+			we_n => rom_4c_we_n
 		);
 	
 	-- pfs rom, 5000h - 53ffh, 1k
-	rom_50 : entity work.rom1_5000
+	rom_50 : entity work.sram
+		generic map (
+			AddrWidth => 10,
+			DataWidth => 8
+		)
 		port map (
-			clk => clk,
-			addr => cpuAddr(9 downto 0),
-			data => rom_50_dat
+			clk  => clk,
+			addr => romAddr,
+			din  => dn_data,
+			dout => rom_50_dat,
+			ce_n => '0', 
+			we_n => rom_50_we_n
 		);
 	
 	-- pfs rom, 5400h - 57ffh, 1k
-	rom_54 : entity work.rom1_5400
+	rom_54 : entity work.sram
+		generic map (
+			AddrWidth => 10,
+			DataWidth => 8
+		)
 		port map (
-			clk => clk,
-			addr => cpuAddr(9 downto 0),
-			data => rom_54_dat
+			clk  => clk,
+			addr => romAddr,
+			din  => dn_data,
+			dout => rom_54_dat,
+			ce_n => '0', 
+			we_n => rom_54_we_n
 		);
 		
 	-- pfs rom, 5800h - 5bffh, 1k
-	rom_58 : entity work.rom1_5800
+	rom_58 : entity work.sram
+		generic map (
+			AddrWidth => 10,
+			DataWidth => 8
+		)
 		port map (
-			clk => clk,
-			addr => cpuAddr(9 downto 0),
-			data => rom_58_dat
+			clk  => clk,
+			addr => romAddr,
+			din  => dn_data,
+			dout => rom_58_dat,
+			ce_n => '0', 
+			we_n => rom_58_we_n
 		);
 	
 	-- pfs rom, 5c00h - 5fffh, 1k
-	rom_5c : entity work.rom1_5c00
+	rom_5c : entity work.sram
+		generic map (
+			AddrWidth => 10,
+			DataWidth => 8
+		)
 		port map (
-			clk => clk,
-			addr => cpuAddr(9 downto 0),
-			data => rom_5c_dat
+			clk  => clk,
+			addr => romAddr,
+			din  => dn_data,
+			dout => rom_5c_dat,
+			ce_n => '0', 
+			we_n => rom_5c_we_n
 		);
 	
 	-- pfs rom, 6000h - 63ffh, 1k
-	rom_60 : entity work.rom1_6000
+	rom_60 : entity work.sram
+		generic map (
+			AddrWidth => 10,
+			DataWidth => 8
+		)
 		port map (
-			clk => clk,
-			addr => cpuAddr(9 downto 0),
-			data => rom_60_dat
+			clk  => clk,
+			addr => romAddr,
+			din  => dn_data,
+			dout => rom_60_dat,
+			ce_n => '0', 
+			we_n => rom_60_we_n
 		);
 	
 	-- pfs rom, 6400h - 67ffh, 1k
-	rom_64 : entity work.rom1_6400
+	rom_64 : entity work.sram
+		generic map (
+			AddrWidth => 10,
+			DataWidth => 8
+		)
 		port map (
-			clk => clk,
-			addr => cpuAddr(9 downto 0),
-			data => rom_64_dat
+			clk  => clk,
+			addr => romAddr,
+			din  => dn_data,
+			dout => rom_64_dat,
+			ce_n => '0', 
+			we_n => rom_64_we_n
 		);
 		
 	-- pfs rom, 6800h - 6bffh, 1k
-	rom_68 : entity work.rom1_6800
+	rom_68 : entity work.sram
+		generic map (
+			AddrWidth => 10,
+			DataWidth => 8
+		)
 		port map (
-			clk => clk,
-			addr => cpuAddr(9 downto 0),
-			data => rom_68_dat
+			clk  => clk,
+			addr => romAddr,
+			din  => dn_data,
+			dout => rom_68_dat,
+			ce_n => '0', 
+			we_n => rom_68_we_n
 		);
 	
 	-- pfs rom, 6c00h - 6fffh, 1k
-	rom_6c : entity work.rom1_6c00
+	rom_6c : entity work.sram
+		generic map (
+			AddrWidth => 10,
+			DataWidth => 8
+		)
 		port map (
-			clk => clk,
-			addr => cpuAddr(9 downto 0),
-			data => rom_6c_dat
+			clk  => clk,
+			addr => romAddr,
+			din  => dn_data,
+			dout => rom_6c_dat,
+			ce_n => '0', 
+			we_n => rom_6c_we_n
 		);
 	
 	-- pfs rom, 7000h - 73ffh, 1k
-	rom_70 : entity work.rom1_7000
+	rom_70 : entity work.sram
+		generic map (
+			AddrWidth => 10,
+			DataWidth => 8
+		)
 		port map (
-			clk => clk,
-			addr => cpuAddr(9 downto 0),
-			data => rom_70_dat
+			clk  => clk,
+			addr => romAddr,
+			din  => dn_data,
+			dout => rom_70_dat,
+			ce_n => '0', 
+			we_n => rom_70_we_n
 		);
 	
 	-- pfs rom, 7400h - 77ffh, 1k
-	rom_74 : entity work.rom1_7400
+	rom_74 : entity work.sram
+		generic map (
+			AddrWidth => 10,
+			DataWidth => 8
+		)
 		port map (
-			clk => clk,
-			addr => cpuAddr(9 downto 0),
-			data => rom_74_dat
+			clk  => clk,
+			addr => romAddr,
+			din  => dn_data,
+			dout => rom_74_dat,
+			ce_n => '0', 
+			we_n => rom_74_we_n
 		);
 		
 	-- pfs rom, 7800h - 7bffh, 1k
-	rom_78 : entity work.rom1_7800
+	rom_78 : entity work.sram
+		generic map (
+			AddrWidth => 10,
+			DataWidth => 8
+		)
 		port map (
-			clk => clk,
-			addr => cpuAddr(9 downto 0),
-			data => rom_78_dat
+			clk  => clk,
+			addr => romAddr,
+			din  => dn_data,
+			dout => rom_78_dat,
+			ce_n => '0', 
+			we_n => rom_78_we_n
 		);
 	
 	-- pfs rom, 7c00h - 7fffh, 1k
-	rom_7c : entity work.rom1_7c00
+	rom_7c : entity work.sram
+		generic map (
+			AddrWidth => 10,
+			DataWidth => 8
+		)
 		port map (
-			clk => clk,
-			addr => cpuAddr(9 downto 0),
-			data => rom_7c_dat
+			clk  => clk,
+			addr => romAddr,
+			din  => dn_data,
+			dout => rom_7c_dat,
+			ce_n => '0', 
+			we_n => rom_7c_we_n
 		);
 	
 	-- pfs rom, 8000h - 83ffh, 1k
-	rom_80 : entity work.rom1_8000
+	rom_80 : entity work.sram
+		generic map (
+			AddrWidth => 10,
+			DataWidth => 8
+		)
 		port map (
-			clk => clk,
-			addr => cpuAddr(9 downto 0),
-			data => rom_80_dat
+			clk  => clk,
+			addr => romAddr,
+			din  => dn_data,
+			dout => rom_80_dat,
+			ce_n => '0',
+			we_n => rom_80_we_n
 		);
 	
 	-- pfs rom, 8400h - 87ffh, 1k
-	rom_84 : entity work.rom1_8400
+	rom_84 : entity work.sram
+		generic map (
+			AddrWidth => 10,
+			DataWidth => 8
+		)
 		port map (
-			clk => clk,
-			addr => cpuAddr(9 downto 0),
-			data => rom_84_dat
+			clk  => clk,
+			addr => romAddr,
+			din  => dn_data,
+			dout => rom_84_dat,
+			ce_n => '0', 
+			we_n => rom_84_we_n
 		);
 		
 	-- pfs rom, 8800h - 8bffh, 1k
-	rom_88 : entity work.rom1_8800
+	rom_88 : entity work.sram
+		generic map (
+			AddrWidth => 10,
+			DataWidth => 8
+		)
 		port map (
-			clk => clk,
-			addr => cpuAddr(9 downto 0),
-			data => rom_88_dat
+			clk  => clk,
+			addr => romAddr,
+			din  => dn_data,
+			dout => rom_88_dat,
+			ce_n => '0', 
+			we_n => rom_88_we_n
 		);
 	
 	-- pfs rom, 8c00h - 8fffh, 1k
-	rom_8c : entity work.rom1_8c00
+	rom_8c : entity work.sram
+		generic map (
+			AddrWidth => 10,
+			DataWidth => 8
+		)
 		port map (
-			clk => clk,
-			addr => cpuAddr(9 downto 0),
-			data => rom_8c_dat
+			clk  => clk,
+			addr => romAddr,
+			din  => dn_data,
+			dout => rom_8c_dat,
+			ce_n => '0', 
+			we_n => rom_8c_we_n
 		);
 end;

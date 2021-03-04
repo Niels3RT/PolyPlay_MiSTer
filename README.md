@@ -12,6 +12,8 @@ See https://en.wikipedia.org/wiki/Poly_Play
 
 There is a lot of guesswork going on (clocks, video). Tested on HDMI output only, analog video hopefully soon.
 
+The romset (polyplay.zip) should come from mame 0229.
+
 First button is fire, second button coin.
 
 ## The Copyright Notice that came with the Sources of the KC87 and KC85/4 cores

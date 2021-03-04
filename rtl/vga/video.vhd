@@ -54,6 +54,7 @@ entity video is
 		);
 	port (
 		clk				: in  std_logic;
+		cpuclk			: in  std_logic;
 
 		red				: out std_logic_vector(7 downto 0);
 		green				: out std_logic_vector(7 downto 0);
@@ -68,7 +69,11 @@ entity video is
 		cg_ram_Datab	: in  std_logic_vector(7 downto 0);
 		cg_ram_Datac	: in  std_logic_vector(7 downto 0);
 		vid_ram_Addr	: out std_logic_vector(10 downto 0);
-		vid_ram_Data	: in  std_logic_vector(7 downto 0)
+		vid_ram_Data	: in  std_logic_vector(7 downto 0);
+		
+		dn_addr			: in std_logic_vector(15 downto 0);
+		dn_data			: in std_logic_vector(7 downto 0);
+		dn_wr				: in std_logic
 	); 
 end video;
 
@@ -80,6 +85,7 @@ architecture rtl of video is
 
 	signal cg_rom_Addr	: std_logic_vector(9 downto 0);
 	signal cg_rom_Data	: std_logic_vector(7 downto 0);
+	signal cg_rom_cs		: std_logic;
 
 	signal outputa			: std_logic_vector(7 downto 0);
 	signal outputb			: std_logic_vector(7 downto 0);
@@ -181,10 +187,24 @@ begin
 	end process;
  
 	-- character rom, e800h - ebffh, 1k
-	rom_char : entity work.rom_char1
+	cg_rom_cs <= '0' when dn_addr(15 downto 10) = b"000000" else '1';
+	rom_char : entity work.dualsram
+		generic map (
+			AddrWidth => 10
+		)
 		port map (
-			clk => clk,
-			addr => cg_rom_Addr(9 downto 0),
-			data => cg_rom_Data
+			clk1  => clk,
+			addr1 => cg_rom_Addr(9 downto 0),
+			din1  => x"00",
+			dout1 => cg_rom_Data,
+			cs1_n => '0', 
+			wr1_n => '1',
+
+			clk2  => cpuclk,
+			addr2 => dn_addr(9 downto 0),
+			din2  => dn_data,
+			dout2 => open,
+			cs2_n => cg_rom_cs,
+			wr2_n => not dn_wr
 		);
 end rtl;

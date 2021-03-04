@@ -1,0 +1,58 @@
+<misterromdescription>
+	<name>Poly Play</name>
+	<mameversion>0229</mameversion>
+	<setname>polyplay</setname>
+	<mratimestamp>20210304072300</mratimestamp>
+	<year>1985</year>
+	<manufacturer>VEB Polytechnik</manufacturer>
+	<category>Action</category>
+	<rbf>PolyPlay</rbf>
+
+	<rom index="0" zip="polyplay.zip" md5="e1fd6666eb78b1e6cfaf0e9ef6da5836">
+		<part crc="5242DD6B" name="char.1"/>
+		<part crc="87884C5F" name="cpu_0000.37"/>
+		<part crc="D5C84829" name="cpu_0400.36"/>
+		<part crc="5F36D08E" name="cpu_0800.35"/>
+
+		<part crc="950DFCDB" name="2_-_1000.14"/>
+		<part crc="829F74CA" name="2_-_1400.10"/>
+		<part crc="B69306F5" name="2_-_1800.6"/>
+		<part crc="AEDE2280" name="2_-_1c00.2"/>
+
+		<part crc="6C7AD0D8" name="2_-_2000.15"/>
+		<part crc="BC7462F0" name="2_-_2400.11"/>
+		<part crc="9CCF1958" name="2_-_2800.7"/>
+		<part crc="21827930" name="2_-_2c00.3"/>
+
+		<part crc="B3B3C0EC" name="2_-_3000.16"/>
+		<part crc="BD416CD0" name="2_-_3400.12"/>
+		<part crc="1C470B7C" name="2_-_3800.8"/>
+		<part crc="B8354A19" name="2_-_3c00.4"/>
+
+		<part crc="1E01041E" name="2_-_4000.17"/>
+		<part crc="FE4D8959" name="2_-_4400.13"/>
+		<part crc="C45F1D9D" name="2_-_4800.9"/>
+		<part crc="26950AD6" name="2_-_4c00.5"/>
+
+		<part crc="9F5E2BA1" name="1_-_5000.30"/>
+		<part crc="B5F9A780" name="1_-_5400.26"/>
+		<part crc="D973AD12" name="1_-_5800.22"/>
+		<part crc="9C22EA79" name="1_-_5c00.18"/>
+
+		<part crc="245C49CA" name="1_-_6000.31"/>
+		<part crc="181E427E" name="1_-_6400.27"/>
+		<part crc="8A6C1F97" name="1_-_6800.23"/>
+		<part crc="77901DC9" name="1_-_6c00.19"/>
+
+		<part crc="83FFBE57" name="1_-_7000.32"/>
+		<part crc="E2A66531" name="1_-_7400.28"/>
+		<part crc="1D0803EF" name="1_-_7800.24"/>
+		<part crc="17DFA7E4" name="1_-_7c00.20"/>
+
+		<part crc="6EE02375" name="1_-_8000.33"/>
+		<part crc="9DB09598" name="1_-_8400.29"/>
+		<part crc="CA2F963F" name="1_-_8800.25"/>
+		<part crc="0C7DEC2D" name="1_-_8c00.21"/>
+	</rom>
+   
+</misterromdescription>

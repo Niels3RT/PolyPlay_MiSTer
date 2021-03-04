@@ -211,6 +211,10 @@ wire  [1:0] buttons;
 wire [31:0] status;
 wire [31:0] joystick_0;
 
+wire        ioctl_wr;
+wire [24:0] ioctl_addr;
+wire  [7:0] ioctl_dout;
+
 hps_io #(.STRLEN($size(CONF_STR)>>3)) hps_io
 (
 	.clk_sys(clk_sys),
@@ -224,7 +228,11 @@ hps_io #(.STRLEN($size(CONF_STR)>>3)) hps_io
 	.status(status),
 	.status_menumask({status[5]}),
 
-	.joystick_0(joystick_0)
+	.joystick_0(joystick_0),
+	
+	.ioctl_wr(ioctl_wr),
+	.ioctl_addr(ioctl_addr),
+	.ioctl_dout(ioctl_dout)
 );
 
 ///////////////////////   CLOCKS   ///////////////////////////////
@@ -277,7 +285,11 @@ PolyPlay PolyPlay
 	.LED_POWER(LED_POWER),
 	.LED_DISK(LED_DISK),
 	
-	.USER_OUT(USER_OUT)
+	.USER_OUT(USER_OUT),
+	
+	.dn_addr(ioctl_addr[15:0]),
+	.dn_data(ioctl_dout),
+	.dn_wr(ioctl_wr)
 );
 
 assign CLK_VIDEO = clk_vga;
