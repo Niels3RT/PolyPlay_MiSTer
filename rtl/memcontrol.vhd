@@ -115,11 +115,13 @@ begin
 					-- write memory
 					if		(cpuMREQ_n = '0' and cpuWR_n = '0') then
 						mem_state   <= write_wait;
-						if		cpuAddr < x"ec00" then ram_main_we_n_t  <= '0';	-- main ram
-						elsif	cpuAddr < x"f000" then ram_char_we_n_1a <= '0';	-- character ram a
-						elsif	cpuAddr < x"f400" then ram_char_we_n_1b <= '0';	-- character ram b
-						elsif	cpuAddr < x"f800" then ram_char_we_n_1c <= '0';	-- character ram c
-						else								  ram_vid_we_n_1   <= '0';	-- video ram
+						if		cpuAddr >= x"0c00" and cpuAddr < x"1000" and tno = x"00" then ram_main_we_n_t  <= '0';	-- polyplay main ram
+						elsif	cpuAddr >= x"c000" and cpuAddr < x"d000" and tno = x"01" then ram_main_we_n_t  <= '0';	-- polyplay 2 lower ram
+						elsif	cpuAddr >= x"ea00" and cpuAddr < x"ec00" and tno = x"01" then ram_main_we_n_t  <= '0';	-- polyplay 2 higher ram
+						elsif	cpuAddr >= x"ec00" and cpuAddr < x"f000" then ram_char_we_n_1a <= '0';	-- character ram a
+						elsif	cpuAddr >= x"f000" and cpuAddr < x"f400" then ram_char_we_n_1b <= '0';	-- character ram b
+						elsif	cpuAddr >= x"f400" and cpuAddr < x"f800" then ram_char_we_n_1c <= '0';	-- character ram c
+						elsif	cpuAddr >= x"f800" then ram_vid_we_n_1   <= '0';	-- video ram
 						end if;
 					-- read memory
 					elsif (cpuMREQ_n='0' and cpuRD_n='0') then
