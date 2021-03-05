@@ -4,7 +4,23 @@
 			"name" : "Top",
 			"pins" : [
 				{
+					"name" : "VGA_B[0]",
+					"strict" : false
+				},
+				{
 					"name" : "HDMI_I2C_SCL",
+					"strict" : false
+				},
+				{
+					"name" : "HDMI_SCLK",
+					"strict" : false
+				},
+				{
+					"name" : "HDMI_LRCLK",
+					"strict" : false
+				},
+				{
+					"name" : "HDMI_I2S",
 					"strict" : false
 				},
 				{
@@ -20,15 +36,31 @@
 					"strict" : false
 				},
 				{
-					"name" : "HDMI_SCLK",
+					"name" : "LED_USER",
 					"strict" : false
 				},
 				{
-					"name" : "HDMI_LRCLK",
+					"name" : "LED_HDD",
 					"strict" : false
 				},
 				{
-					"name" : "HDMI_I2S",
+					"name" : "LED_POWER",
+					"strict" : false
+				},
+				{
+					"name" : "SD_SPI_CS",
+					"strict" : false
+				},
+				{
+					"name" : "LED[0]",
+					"strict" : false
+				},
+				{
+					"name" : "LED[2]",
+					"strict" : false
+				},
+				{
+					"name" : "LED[4]",
 					"strict" : false
 				},
 				{
@@ -188,10 +220,6 @@
 					"strict" : false
 				},
 				{
-					"name" : "VGA_B[0]",
-					"strict" : false
-				},
-				{
 					"name" : "VGA_B[1]",
 					"strict" : false
 				},
@@ -216,27 +244,7 @@
 					"strict" : false
 				},
 				{
-					"name" : "LED_USER",
-					"strict" : false
-				},
-				{
-					"name" : "LED_HDD",
-					"strict" : false
-				},
-				{
-					"name" : "LED_POWER",
-					"strict" : false
-				},
-				{
-					"name" : "SD_SPI_CS",
-					"strict" : false
-				},
-				{
 					"name" : "IO_SCL",
-					"strict" : false
-				},
-				{
-					"name" : "LED[0]",
 					"strict" : false
 				},
 				{
@@ -244,15 +252,7 @@
 					"strict" : false
 				},
 				{
-					"name" : "LED[2]",
-					"strict" : false
-				},
-				{
 					"name" : "LED[3]",
-					"strict" : false
-				},
-				{
-					"name" : "LED[4]",
 					"strict" : false
 				},
 				{
@@ -272,11 +272,11 @@
 					"strict" : false
 				},
 				{
-					"name" : "IO_SDA",
+					"name" : "SDCD_SPDIF",
 					"strict" : false
 				},
 				{
-					"name" : "SDCD_SPDIF",
+					"name" : "IO_SDA",
 					"strict" : false
 				},
 				{
@@ -308,15 +308,15 @@
 					"strict" : false
 				},
 				{
+					"name" : "VGA_EN",
+					"strict" : false
+				},
+				{
 					"name" : "FPGA_CLK1_50",
 					"strict" : false
 				},
 				{
 					"name" : "SW[0]",
-					"strict" : false
-				},
-				{
-					"name" : "VGA_EN",
 					"strict" : false
 				},
 				{
