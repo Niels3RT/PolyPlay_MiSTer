@@ -61,6 +61,8 @@ entity PolyPlay is
 		LED_POWER		: out std_logic_vector(1 downto 0);
 		LED_DISK			: out std_logic_vector(1 downto 0);
 		
+		organ				: in  std_logic_vector(1 downto 0);
+		
 		USER_OUT			: out std_logic_vector(6 downto 0);
 		
 		dn_addr			: in std_logic_vector(15 downto 0);
@@ -134,12 +136,12 @@ architecture struct of PolyPlay is
 
 begin
 	-- debug output
-	USER_OUT <= dbg_out(6 downto 0);
+	USER_OUT(6 downto 3) <= dbg_out(3 downto 0);
 
 	-- reset
 	cpuReset_n <= '0' when resetDelay /= 0 else '1';
 	--LED_USER <= cpuReset_n;
-	LED_USER <= tno(0);
+	--LED_USER <= tno(0);
 
 	reset : process
 	begin
@@ -343,5 +345,18 @@ begin
 			rd_n      => cpuRD_n,
 			reti_n    => cpuRETI_n,
 			intEna_n  => cpuIntEna_n
+		);
+		
+	-- light organ
+	lights : entity work.lights
+		port map (
+			clk			=> clk_audio,
+			reset_n		=> cpuReset_n,
+			pioBOut		=> pioBOut,
+			LED_USER		=> LED_USER,
+			LED_POWER	=> LED_POWER,
+			LED_DISK		=> LED_DISK,
+			organ			=> organ,
+			USER_OUT		=> USER_OUT(2 downto 0)
 		);
 end;

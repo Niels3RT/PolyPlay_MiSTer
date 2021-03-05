@@ -25,65 +25,72 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all; 
 
-entity audio is 
+entity lights is 
 	port (
-		clk				: in  std_logic;		-- 24.576 MHz
+		clk				: in  std_logic;
 		reset_n			: in  std_logic;
 		
-		AUDIO_L			: out std_logic_vector(15 downto 0);
-		AUDIO_R			: out std_logic_vector(15 downto 0);
+		pioBOut			: in  std_logic_vector(7 downto 0);
 		
-		ctcTcTo			: in  std_logic_vector(1 downto 0)
+		LED_USER			: out std_logic;
+		LED_POWER		: out std_logic_vector(1 downto 0);
+		LED_DISK			: out std_logic_vector(1 downto 0);
+		
+		organ				: in  std_logic_vector(1 downto 0);
+		
+		USER_OUT			: out std_logic_vector(2 downto 0)
 	);
-end audio;
+end lights;
 
-architecture rtl of audio is
-	signal divide_frq		: unsigned(16 downto 0) := (others => '0');
-	
-	signal ctc_to_a		: std_logic_vector(1 downto 0);
-	signal ctc_to_b		: std_logic_vector(1 downto 0);
-	signal ctc_to			: std_logic_vector(1 downto 0);
-	
-	signal level			: std_logic_vector(1 downto 0) := (others => '0');
-	signal ctcTcTo_old	: std_logic_vector(1 downto 0) := (others => '0');
-	
-	signal sig_noise		: std_logic_vector(1 downto 0) := (others => '0');
+architecture rtl of lights is
+	signal ds			: std_logic_vector(2 downto 0);
 	
 begin
 	process
 	begin
 		wait until rising_edge(clk);
 		
-		-- cross clocks
-		ctc_to_a    <= ctcTcTo;
-		ctc_to_b    <= ctc_to_a;
-		ctc_to      <= ctc_to_b;
+		ds <= pioBOut(2 downto 0);
 		
-		-- detect audio
-		-- audio out 0
-		if ctcTcTo_old(0) /= ctc_to(0) and ctc_to(0) = '1' then
-			sig_noise(0) <= '1';
+		if reset_n = '0' then
+			LED_POWER <= b"10";
+			LED_DISK  <= b"10";
+			LED_USER  <= '0';
+			USER_OUT  <= (others => '1');
+		else
+			case organ is
+				when b"00"  =>		-- output to mister leds
+					case ds is
+						when b"000" =>
+							LED_POWER <= b"10";
+							LED_DISK  <= b"11";
+							LED_USER  <= '1';
+						when b"001" =>
+							LED_POWER <= b"11";
+							LED_DISK  <= b"10";
+							LED_USER  <= '1';
+						when b"010" =>
+							LED_POWER <= b"11";
+							LED_DISK  <= b"11";
+							LED_USER  <= '0';
+						when others =>
+							LED_POWER <= b"11";
+							LED_DISK  <= b"11";
+							LED_USER  <= '1';
+					end case;
+				when b"01"  =>		-- output to DS8205D on user port 2:0
+					USER_OUT <= pioBOut(2 downto 0);
+					LED_POWER <= b"11";
+					LED_DISK  <= b"11";
+					LED_USER  <= '0';
+				when others =>		-- ignore light organ output
+					LED_POWER <= b"11";
+					LED_DISK  <= b"10";
+					LED_USER  <= '1';
+					USER_OUT <= (others => '1');
+			end case;
 		end if;
-		ctcTcTo_old(0) <= ctc_to(0);
-		-- audio out 1
-		if ctcTcTo_old(1) /= ctc_to(1) and ctc_to(1) = '1' then
-			sig_noise(1) <= '1';
-		end if;
-		ctcTcTo_old(1) <= ctc_to(1);
 		
-		-- play audio
-		divide_frq <= divide_frq + 1;
-		if divide_frq(4 downto 0) = b"00000" then
-			if sig_noise(0) = '1' then
-				sig_noise(0) <= '0';
-				level(0) <= not level(0);
-				AUDIO_L <= level(0) & level(0) & level(0) & b"0000000000000";
-			end if;
-			if sig_noise(1) = '1' then
-				sig_noise(1) <= '0';
-				level(1) <= not level(1);
-				AUDIO_R <= level(1) & level(1) & level(1) & b"0000000000000";
-			end if;
-		end if;
+		
 	end process;
 end;

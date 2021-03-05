@@ -37,17 +37,17 @@ entity audio is
 	);
 end audio;
 
-architecture rtl of audio is
-	signal divide_frq		: unsigned(16 downto 0) := (others => '0');
-	
-	signal ctc_to_a		: std_logic_vector(1 downto 0);
-	signal ctc_to_b		: std_logic_vector(1 downto 0);
-	signal ctc_to			: std_logic_vector(1 downto 0);
-	
-	signal level			: std_logic_vector(1 downto 0) := (others => '0');
-	signal ctcTcTo_old	: std_logic_vector(1 downto 0) := (others => '0');
-	
-	signal sig_noise		: std_logic_vector(1 downto 0) := (others => '0');
+	architecture rtl of audio is
+		signal divide_frq		: unsigned(16 downto 0) := (others => '0');
+		
+		signal ctc_to_a		: std_logic_vector(1 downto 0);
+		signal ctc_to_b		: std_logic_vector(1 downto 0);
+		signal ctc_to			: std_logic_vector(1 downto 0);
+		
+		signal level			: std_logic_vector(1 downto 0) := (others => '0');
+		signal ctcTcTo_old	: std_logic_vector(1 downto 0) := (others => '0');
+		
+		signal sig_noise		: std_logic_vector(1 downto 0) := (others => '0');
 	
 begin
 	process

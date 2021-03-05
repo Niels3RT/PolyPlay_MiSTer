@@ -191,6 +191,7 @@ assign VIDEO_ARX = (!ar) ? 12'd4 : (ar - 1'd1);
 assign VIDEO_ARY = (!ar) ? 12'd3 : 12'd0;
 assign AUDIO_MIX = status[4:3];
 assign AUDIO_S   = 0;  // unsigned audio data
+wire [1:0] organ = status[6:5];
 
 `include "build_id.v" 
 localparam CONF_STR = {
@@ -199,6 +200,8 @@ localparam CONF_STR = {
 	"O12,Aspect ratio,Original,Full Screen,[ARC1],[ARC2];",
 	"-;",
 	"O34,Stereo Mix,None,25%,50%,100%;",
+	"-;",
+	"O56,Light Organ,MiSTer LED,ext. DS8205D,OFF;",
 	"-;",
 	"T0,Reset;",
 	"R0,Reset and close OSD;",
@@ -290,6 +293,8 @@ PolyPlay PolyPlay
 	.LED_USER(LED_USER),
 	.LED_POWER(LED_POWER),
 	.LED_DISK(LED_DISK),
+	
+	.organ(organ),
 	
 	.USER_OUT(USER_OUT),
 	

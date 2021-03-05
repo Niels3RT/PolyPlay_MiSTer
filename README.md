@@ -16,6 +16,14 @@ The romsets (polyplay.zip/polyplay2.zip) should come from mame 0229.
 
 First button is fire, second button coin.
 
+## Light Organ
+
+The original hardware features a "light organ" on top of the cabinet, basically a row of colored lightbulbs. On MiSTer there are 3 modes for it:
+
+1. use the 3 LEDs on MiSTer
+1. the ext. DS8205D setting outputs the signals to user port bits 2:0 that were passed to a DS8205 on original hardware. 74xx137 are functionally identical and could be used for a modern recreation.
+1. off, ignore it
+
 ## The Copyright Notice that came with the Sources of the KC87 and KC85/4 cores
 
 Copyright (c) 2015, $ME
