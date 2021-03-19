@@ -10,7 +10,7 @@ See https://en.wikipedia.org/wiki/Poly_Play
 
 ## The MiSTer Core
 
-There is a lot of guesswork going on (clocks, video). Tested on HDMI output only, analog video hopefully soon.
+There is a lot of guesswork going on (clocks, video). Analog video should be good now, at least my flatscreen tv accepts the rgb+composite sync output.
 
 The romsets (polyplay.zip/polyplay2.zip) should come from mame 0229.
 
