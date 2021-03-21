@@ -125,11 +125,11 @@ begin
 			s1.pos_x <= s0.cnt_h - 128; 
 			s1.pos_y <= s0.cnt_v - 6;
 			-- horizontal sync
-			if s0.cnt_h < 40 then
+			if s0.cnt_h < 40 then		-- B&O syncs ok
 				s1.sync_h <= H_SYNC_ACTIVE;
 			end if;
 			-- vertical sync
-			if s0.cnt_v > 280 and s0.cnt_v < 313 then
+			if s0.cnt_v > 280 and s0.cnt_v < 284 then		-- seems ok? B&O seems to like it
 				s1.sync_v <= V_SYNC_ACTIVE;
 			end if;
 		end if;
@@ -160,31 +160,33 @@ begin
 		s5 <= s4;
 		-- stage 5
 		if s5.do_stuff = '1' then
-			if s5.use_cg_ram = '0' then
-				if		s5.pos_x(2 downto 0) = b"111" then red <= (others => cg_rom_Data(0)); green <= (others => cg_rom_Data(0)); blue <= (others => cg_rom_Data(0));
-				elsif s5.pos_x(2 downto 0) = b"110" then red <= (others => cg_rom_Data(1)); green <= (others => cg_rom_Data(1)); blue <= (others => cg_rom_Data(1));
-				elsif s5.pos_x(2 downto 0) = b"101" then red <= (others => cg_rom_Data(2)); green <= (others => cg_rom_Data(2)); blue <= (others => cg_rom_Data(2));
-				elsif s5.pos_x(2 downto 0) = b"100" then red <= (others => cg_rom_Data(3)); green <= (others => cg_rom_Data(3)); blue <= (others => cg_rom_Data(3));
-				elsif s5.pos_x(2 downto 0) = b"011" then red <= (others => cg_rom_Data(4)); green <= (others => cg_rom_Data(4)); blue <= (others => cg_rom_Data(4));
-				elsif s5.pos_x(2 downto 0) = b"010" then red <= (others => cg_rom_Data(5)); green <= (others => cg_rom_Data(5)); blue <= (others => cg_rom_Data(5));
-				elsif s5.pos_x(2 downto 0) = b"001" then red <= (others => cg_rom_Data(6)); green <= (others => cg_rom_Data(6)); blue <= (others => cg_rom_Data(6));
-				elsif s5.pos_x(2 downto 0) = b"000" then red <= (others => cg_rom_Data(7)); green <= (others => cg_rom_Data(7)); blue <= (others => cg_rom_Data(7));
+			if s5.blank_h /= H_BLANK_ACTIVE and s5.blank_v /= V_BLANK_ACTIVE then
+				if s5.use_cg_ram = '0' then
+					if		s5.pos_x(2 downto 0) = b"111" then red <= (others => cg_rom_Data(0)); green <= (others => cg_rom_Data(0)); blue <= (others => cg_rom_Data(0));
+					elsif s5.pos_x(2 downto 0) = b"110" then red <= (others => cg_rom_Data(1)); green <= (others => cg_rom_Data(1)); blue <= (others => cg_rom_Data(1));
+					elsif s5.pos_x(2 downto 0) = b"101" then red <= (others => cg_rom_Data(2)); green <= (others => cg_rom_Data(2)); blue <= (others => cg_rom_Data(2));
+					elsif s5.pos_x(2 downto 0) = b"100" then red <= (others => cg_rom_Data(3)); green <= (others => cg_rom_Data(3)); blue <= (others => cg_rom_Data(3));
+					elsif s5.pos_x(2 downto 0) = b"011" then red <= (others => cg_rom_Data(4)); green <= (others => cg_rom_Data(4)); blue <= (others => cg_rom_Data(4));
+					elsif s5.pos_x(2 downto 0) = b"010" then red <= (others => cg_rom_Data(5)); green <= (others => cg_rom_Data(5)); blue <= (others => cg_rom_Data(5));
+					elsif s5.pos_x(2 downto 0) = b"001" then red <= (others => cg_rom_Data(6)); green <= (others => cg_rom_Data(6)); blue <= (others => cg_rom_Data(6));
+					elsif s5.pos_x(2 downto 0) = b"000" then red <= (others => cg_rom_Data(7)); green <= (others => cg_rom_Data(7)); blue <= (others => cg_rom_Data(7));
+					end if;
+				else
+					if		s5.pos_x(2 downto 0) = b"111" then red <= (others => cg_ram_Datac(0)); green <= (others => cg_ram_Datab(0)); blue <= (others => cg_ram_Dataa(0));
+					elsif s5.pos_x(2 downto 0) = b"110" then red <= (others => cg_ram_Datac(1)); green <= (others => cg_ram_Datab(1)); blue <= (others => cg_ram_Dataa(1));
+					elsif s5.pos_x(2 downto 0) = b"101" then red <= (others => cg_ram_Datac(2)); green <= (others => cg_ram_Datab(2)); blue <= (others => cg_ram_Dataa(2));
+					elsif s5.pos_x(2 downto 0) = b"100" then red <= (others => cg_ram_Datac(3)); green <= (others => cg_ram_Datab(3)); blue <= (others => cg_ram_Dataa(3));
+					elsif s5.pos_x(2 downto 0) = b"011" then red <= (others => cg_ram_Datac(4)); green <= (others => cg_ram_Datab(4)); blue <= (others => cg_ram_Dataa(4));
+					elsif s5.pos_x(2 downto 0) = b"010" then red <= (others => cg_ram_Datac(5)); green <= (others => cg_ram_Datab(5)); blue <= (others => cg_ram_Dataa(5));
+					elsif s5.pos_x(2 downto 0) = b"001" then red <= (others => cg_ram_Datac(6)); green <= (others => cg_ram_Datab(6)); blue <= (others => cg_ram_Dataa(6));
+					elsif s5.pos_x(2 downto 0) = b"000" then red <= (others => cg_ram_Datac(7)); green <= (others => cg_ram_Datab(7)); blue <= (others => cg_ram_Dataa(7));
+					end if;
 				end if;
-			else
-				if		s5.pos_x(2 downto 0) = b"111" then red <= (others => cg_ram_Datac(0)); green <= (others => cg_ram_Datab(0)); blue <= (others => cg_ram_Dataa(0));
-				elsif s5.pos_x(2 downto 0) = b"110" then red <= (others => cg_ram_Datac(1)); green <= (others => cg_ram_Datab(1)); blue <= (others => cg_ram_Dataa(1));
-				elsif s5.pos_x(2 downto 0) = b"101" then red <= (others => cg_ram_Datac(2)); green <= (others => cg_ram_Datab(2)); blue <= (others => cg_ram_Dataa(2));
-				elsif s5.pos_x(2 downto 0) = b"100" then red <= (others => cg_ram_Datac(3)); green <= (others => cg_ram_Datab(3)); blue <= (others => cg_ram_Dataa(3));
-				elsif s5.pos_x(2 downto 0) = b"011" then red <= (others => cg_ram_Datac(4)); green <= (others => cg_ram_Datab(4)); blue <= (others => cg_ram_Dataa(4));
-				elsif s5.pos_x(2 downto 0) = b"010" then red <= (others => cg_ram_Datac(5)); green <= (others => cg_ram_Datab(5)); blue <= (others => cg_ram_Dataa(5));
-				elsif s5.pos_x(2 downto 0) = b"001" then red <= (others => cg_ram_Datac(6)); green <= (others => cg_ram_Datab(6)); blue <= (others => cg_ram_Dataa(6));
-				elsif s5.pos_x(2 downto 0) = b"000" then red <= (others => cg_ram_Datac(7)); green <= (others => cg_ram_Datab(7)); blue <= (others => cg_ram_Dataa(7));
-				end if;
+			else	-- B&O likes it
+				red   <= x"00";
+				green <= x"00";
+				blue  <= x"00";
 			end if;
-		else
-			red   <= (others => '0');
-			green <= (others => '0');
-			blue  <= (others => '0');
 		end if;
 		hsync  <= s5.sync_h;
 		vsync  <= s5.sync_v;
